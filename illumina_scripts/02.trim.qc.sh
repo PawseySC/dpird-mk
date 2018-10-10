@@ -14,9 +14,9 @@
 
 
 # sample id and working directories
-sample="3_1.Desktop_MPS_exercise"
-group="/group/director2091/mdelapierre/illumina/$sample"
-scratch="/scratch/director2091/mdelapierre/illumina/$sample"
+sample=
+group=
+scratch=
 
 # shifter definitions
 module load shifter
@@ -26,6 +26,9 @@ fastqc_cont="quay.io/biocontainers/fastqc:0.11.7--4"
 
 
 cd $scratch
+echo Group directory : $group
+echo Scratch directory : $scratch
+echo SLURM job id : $SLURM_JOB_ID
 
 echo TIME trim1 start $(date)
 $srun_cmd shifter run $bbmap_cont bbduk.sh \

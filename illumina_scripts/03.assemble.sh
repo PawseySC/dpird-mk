@@ -14,9 +14,9 @@
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
 # sample id and working directories
-sample="3_1.Desktop_MPS_exercise"
-group="/group/director2091/mdelapierre/illumina/$sample"
-scratch="/scratch/director2091/mdelapierre/illumina/$sample"
+sample=
+group=
+scratch=
 
 # shifter definitions
 module load shifter
@@ -25,6 +25,9 @@ spades_cont="quay.io/biocontainers/spades:3.12.0--1"
 
 
 cd $scratch
+echo Group directory : $group
+echo Scratch directory : $scratch
+echo SLURM job id : $SLURM_JOB_ID
 
 echo TIME assemble start $(date)
 $srun_cmd shifter run $spades_cont spades.py \

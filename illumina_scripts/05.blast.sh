@@ -14,9 +14,9 @@
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
 # sample id and working directories
-sample="3_1.Desktop_MPS_exercise"
-group="/group/director2091/mdelapierre/illumina/$sample"
-scratch="/scratch/director2091/mdelapierre/illumina/$sample"
+sample=
+group=
+scratch=
 
 # shifter definitions
 module load shifter
@@ -25,6 +25,9 @@ blast_cont="quay.io/biocontainers/blast:2.7.1--h96bfa4b_5"
 
 
 cd $scratch
+echo Group directory : $group
+echo Scratch directory : $scratch
+echo SLURM job id : $SLURM_JOB_ID
 
 # blasting
 echo TIME blast start $(date)
@@ -56,16 +59,5 @@ echo TIME custom tsv end $(date)
 sort -n -r -k 6 blast_unsort_contigs_sub.tsv >blast_contigs_sub.tsv
 echo TIME sort custom tsv end $(date)
 
-top_hits=1
-head -$top_hits blast_contigs_sub.tsv | cut -f 2 >top_hits_seqid.tsv
-export cnt=0
-for seqid in $(cat top_hits_seqid.tsv) ; do 
- $srun_cmd shifter run $blast_cont  blastdbcmd \
-	-db /group/data/blast/nt -entry $seqid \
-	-line_length 60 \
-	-out refseq_$((++cnt)).fasta
-done
-echo TIME get refseqs end $(date)
-
 # copying output data back to group
-cp -p $scratch/blast_contigs_sub.tsv $scratch/blast_contigs_sub.xml $scratch/refseq_*.fasta $group/
+cp -p $scratch/blast_contigs_sub.tsv $scratch/blast_contigs_sub.xml $group/

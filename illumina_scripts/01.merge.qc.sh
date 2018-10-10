@@ -14,9 +14,9 @@
 
 
 # sample id and working directories
-sample="3_1.Desktop_MPS_exercise"
-group="/group/director2091/mdelapierre/illumina/$sample"
-scratch="/scratch/director2091/mdelapierre/illumina/$sample"
+sample=
+group=
+scratch=
 
 # shifter definitions
 module load shifter
@@ -30,6 +30,9 @@ cp -p $group/R1.fastq.gz $group/R2.fastq.gz $scratch/
 
 # running
 cd $scratch
+echo Group directory : $group
+echo Scratch directory : $scratch
+echo SLURM job id : $SLURM_JOB_ID
 
 echo TIME merge start $(date)
 $srun_cmd shifter run $bbmap_cont bbmerge.sh \
