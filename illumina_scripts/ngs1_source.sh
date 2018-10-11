@@ -21,14 +21,14 @@ export spades_bash="shifter run $spades_cont bash"
 export spades_py="shifter run $spades_cont spades.py"
 
 #samtools
-export samtools_cont="marcodelapierre/samtools:1.9"
+export samtools_cont="dpirdmk/samtools:1.9"
 export samtools_bash="shifter run $samtools_cont bash"
 export samtools="shifter run $samtools_cont samtools"
 export samtools_pl="shifter run $samtools_cont samtools.pl"
 export plot_bamstats="shifter run $samtools_cont plot-bamstats"
 
 #bcftools
-export bcftools_cont="marcodelapierre/bcftools:1.9"
+export bcftools_cont="dpirdmk/bcftools:1.9"
 export bcftools_bash="shifter run $bcftools_cont bash"
 export bcftools="shifter run $bcftools_cont bcftools"
 export vcfutils_pl="shifter run $bcftools_cont vcfutils.pl"
