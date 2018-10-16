@@ -13,6 +13,7 @@ export bbmap_sh="shifter run $bbmap_cont bbmap.sh"
 export bbmask_sh="shifter run $bbmap_cont bbmask.sh"
 export bbmerge_sh="shifter run $bbmap_cont bbmerge.sh"
 export bbnorm_sh="shifter run $bbmap_cont bbnorm.sh"
+export bbsplit_sh="shifter run $bbmap_cont bbsplit.sh"
 export stats_sh="shifter run $bbmap_cont stats.sh"
 
 #spades
