@@ -42,4 +42,5 @@ awk -v min_len=$min_len -F _ '{ if( $1 == ">NODE" ){ if( $4 < min_len ) {exit} }
 echo TIME subset end $(date)
 
 # copying output data back to group
+cp -p $scratch/contigs.fasta $group/contigs_ALL.fasta
 cp -p $scratch/contigs_sub.fasta $group/
