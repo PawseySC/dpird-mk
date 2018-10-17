@@ -5,6 +5,7 @@ cont_bin="docker"
 
 packages="
 genomicpariscentre/albacore:2.3.3
+dpirdmk/pomoxis:0.1.11
 quay.io/biocontainers/nanopolish:0.10.2--h78a5b34_0
 "
 
