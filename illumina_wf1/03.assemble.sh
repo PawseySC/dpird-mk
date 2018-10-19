@@ -37,8 +37,8 @@ $srun_cmd shifter run $spades_cont spades.py \
 	-o .
 echo TIME assemble end $(date)
 
-min_len=1000
-awk -v min_len=$min_len -F _ '{ if( $1 == ">NODE" ){ if( $4 < min_len ) {exit} } ; print }' contigs.fasta >contigs_sub.fasta
+min_len_contig=1000
+awk -v min_len_contig=$min_len_contig -F _ '{ if( $1 == ">NODE" ){ if( $4 < min_len_contig ) {exit} } ; print }' contigs.fasta >contigs_sub.fasta
 echo TIME subset end $(date)
 
 # copying output data back to group

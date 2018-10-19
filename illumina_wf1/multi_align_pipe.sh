@@ -24,12 +24,11 @@ scratch="$basescratch/$sample"
 # SLURM script names
 script_map_refseq="06.map_refseq_X.sh"
 script_multi_align="07.multi_align.sh"
+# input file name(s)
+read_file="clean.fastq.gz"
+# file where list of SeqIDs from blasting is created
+idlist_file="list_seqids"
 
-# apply definitions above in SLURM script files
-sed -i "s;#SBATCH --account=.*;#SBATCH --account=$account;g" 0[67]*.sh
-sed -i "s;sample=.*;sample=\"$sample\";g" 0[67]*.sh
-sed -i "s;group=.*;group=\"$group\";g" 0[67]*.sh
-sed -i "s;scratch=.*;scratch=\"$scratch\";g" 0[67]*.sh
 
 # check for command arguments
 if [ $# -eq 0 ] ; then
@@ -38,10 +37,18 @@ if [ $# -eq 0 ] ; then
 fi
 
 # check for read files
-if [ ! -s clean.fastq.gz ] ; then
- echo "Input read file clean.fastq.gz is missing. Exiting."
+if [ ! -s $read_file ] ; then
+ echo "Input read file $read_file is missing. Exiting."
  exit
 fi
+
+# apply definitions above in SLURM script files
+list_script+="$script_map_refseq"
+list_script+=" $script_multi_align"
+sed -i "s;#SBATCH --account=.*;#SBATCH --account=$account;g" $list_script
+sed -i "s;sample=.*;sample=\"$sample\";g" $list_script
+sed -i "s;group=.*;group=\"$group\";g" $list_script
+sed -i "s;scratch=.*;scratch=\"$scratch\";g" $list_script
 
 # create scratch
 mkdir -p $scratch
@@ -52,12 +59,12 @@ echo Scratch directory : $scratch
 # generate required refseq SLURM scripts
 numrefs=$(ls ${script_map_refseq/_X/_[0-9]*} 2>/dev/null | wc -l)
 if [ $numrefs -eq 0 ] ; then
- rm -f list_seqids
+ rm -f $idlist_file
 fi
 for (( i=1 ; i <= $# ; i++ )) ; do 
  scid=$((numrefs+i))
- sed -e "s/seqid=.*/seqid=${!i}/g" -e "s/refseq_X/refseq_$i/g" $script_map_refseq >${script_map_refseq/_X/_$scid}
- echo SeqID ${!i} to script ${script_map_refseq/_X/_$scid} >>list_seqids
+ sed -e "s/seqid=.*/seqid=${!i}/g" -e "s/refseq_X/refseq_$scid/g" $script_map_refseq >${script_map_refseq/_X/_$scid}
+ echo SeqID ${!i} to script ${script_map_refseq/_X/_$scid} >>$idlist_file
 done
 
 # workflow of job submissions

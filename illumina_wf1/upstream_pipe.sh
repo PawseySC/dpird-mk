@@ -27,18 +27,34 @@ script_trim="02.trim.qc.sh"
 script_assemble="03.assemble.sh"
 script_map_contigs="04.map_contigs.sh"
 script_blast="05.blast.sh"
+# input file name(s)
+read_file_1="R1.fastq.gz"
+read_file_2="R2.fastq.gz"
 
-# apply definitions above in SLURM script files
-sed -i "s;#SBATCH --account=.*;#SBATCH --account=$account;g" 0[1-5]*.sh
-sed -i "s;sample=.*;sample=\"$sample\";g" 0[1-5]*.sh
-sed -i "s;group=.*;group=\"$group\";g" 0[1-5]*.sh
-sed -i "s;scratch=.*;scratch=\"$scratch\";g" 0[1-5]*.sh
 
-# check for read files
-if [ ! -s R1.fastq.gz -o ! -s R2.fastq.gz ] ; then
- echo "One or both input read files R1.fastq.gz, R2.fastq.gz are missing. Exiting."
+# check for command arguments
+if [ $# -eq 0 ] ; then
+ echo "You need to provide as an argument the minimum length of contigs to be kepth after assembly. Exiting."
  exit
 fi
+
+# check for read files
+if [ ! -s $read_file_1 -o ! -s $read_file_2 ] ; then
+ echo "One or both input read files $read_file_1, $read_file_2 are missing. Exiting."
+ exit
+fi
+
+# apply definitions above in SLURM script files
+list_script+="$script_merge"
+list_script+=" $script_trim"
+list_script+=" $script_assemble"
+list_script+=" $script_map_contigs"
+list_script+=" $script_blast"
+sed -i "s;#SBATCH --account=.*;#SBATCH --account=$account;g" $list_script
+sed -i "s;sample=.*;sample=\"$sample\";g" $list_script
+sed -i "s;group=.*;group=\"$group\";g" $list_script
+sed -i "s;scratch=.*;scratch=\"$scratch\";g" $list_script
+sed -i "s;^min_len_contig=.*;min_len_contig=$1;g" $script_assemble
 
 # create scratch
 mkdir -p $scratch
