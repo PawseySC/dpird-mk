@@ -46,9 +46,9 @@ fi
 list_script+="$script_map_refseq"
 list_script+=" $script_multi_align"
 sed -i "s;#SBATCH --account=.*;#SBATCH --account=$account;g" $list_script
-sed -i "s;sample=.*;sample=\"$sample\";g" $list_script
-sed -i "s;group=.*;group=\"$group\";g" $list_script
-sed -i "s;scratch=.*;scratch=\"$scratch\";g" $list_script
+sed -i "s;^ *sample=.*;sample=\"$sample\";g" $list_script
+sed -i "s;^ *group=.*;group=\"$group\";g" $list_script
+sed -i "s;^ *scratch=.*;scratch=\"$scratch\";g" $list_script
 
 # create scratch
 mkdir -p $scratch

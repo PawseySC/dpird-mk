@@ -51,10 +51,10 @@ list_script+=" $script_assemble"
 list_script+=" $script_map_contigs"
 list_script+=" $script_blast"
 sed -i "s;#SBATCH --account=.*;#SBATCH --account=$account;g" $list_script
-sed -i "s;sample=.*;sample=\"$sample\";g" $list_script
-sed -i "s;group=.*;group=\"$group\";g" $list_script
-sed -i "s;scratch=.*;scratch=\"$scratch\";g" $list_script
-sed -i "s;^min_len_contig=.*;min_len_contig=$1;g" $script_assemble
+sed -i "s;^ *sample=.*;sample=\"$sample\";g" $list_script
+sed -i "s;^ *group=.*;group=\"$group\";g" $list_script
+sed -i "s;^ *scratch=.*;scratch=\"$scratch\";g" $list_script
+sed -i "s;^ *min_len_contig=.*;min_len_contig=$1;g" $script_assemble
 
 # create scratch
 mkdir -p $scratch
