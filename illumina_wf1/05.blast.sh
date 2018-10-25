@@ -37,7 +37,7 @@ $srun_cmd shifter run $blast_cont blastn \
 	-max_hsps 50 \
 	-word_size 28 -evalue 0.1 \
 	-reward 1 -penalty -2 \
-	-num_threads $SLURM_CPUS_PER_TASK
+	-num_threads $OMP_NUM_THREADS
 echo TIME blast end $(date)
 
 # producing blast output in different formats
