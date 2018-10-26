@@ -7,7 +7,7 @@
 #SBATCH --partition=workq
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=4
 #SBATCH --time=24:00:00
 #SBATCH --mem=120G
 #SBATCH --export=NONE 
@@ -33,7 +33,7 @@ echo TIME assemble start $(date)
 $srun_cmd shifter run $spades_cont spades.py \
 	-s clean.fastq.gz \
 	--only-assembler \
-	-t $OMP_NUM_THREADS -m 120 \
+	-t $OMP_NUM_THREADS -m $((SLURM_MEM_PER_NODE/1024)) \
 	-o .
 echo TIME assemble end $(date)
 

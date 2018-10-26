@@ -11,7 +11,7 @@
 #SBATCH --time=24:00:00
 #SBATCH --mem=50G
 #SBATCH --export=NONE 
-
+export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
 # sample id and working directories
 sample=
@@ -50,7 +50,8 @@ echo TIME map_refseq header end $(date)
 echo TIME map_refseq bbmap start $(date)
 $srun_cmd shifter run $bbmap_cont bbmap.sh \
 	in=clean.fastq.gz ref=refseq_X.fasta out=mapped_refseq_X_unsorted.sam \
-	k=13 maxindel=16000 ambig=random
+	k=13 maxindel=16000 ambig=random \
+	threads=$OMP_NUM_THREADS
 echo TIME map_refseq bbmap end $(date)
 
 $srun_cmd shifter run $samtools_cont samtools \
