@@ -9,7 +9,7 @@
 #SBATCH --ntasks-per-node=1
 #SBATCH --cpus-per-task=4
 #SBATCH --time=24:00:00
-#SBATCH --mem=120G
+#SBATCH --mem=60G
 #SBATCH --export=NONE 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
