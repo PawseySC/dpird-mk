@@ -1,5 +1,6 @@
 # Uptake Prokect 18 - DPIRD
-## Marco De La Pierre, Monica Kehoe
+## Marco De La Pierre, Yathu Sivarajah
+## Monica Kehoe, Sam Hair
 
 This is a project for porting existing workflows into Zeus on an all-open source software stack.
 
