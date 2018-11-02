@@ -1,6 +1,7 @@
 #!/bin/bash -l
 export OMP_NUM_THREADS=16
 
+shopt -s expand_aliases
 alias docker_cmd='docker run --rm -v $(pwd):/data -w /data'
 
 bbmap_cont="quay.io/biocontainers/bbmap:38.20--h470a237_0"
