@@ -21,26 +21,11 @@ group="$basegroup/$sample"
 scratch="$basescratch/$sample"
 
 
-# SLURM script names
-script_basecall="01.basecall.np.sh"
-script_filter="02.filter.np.sh"
-script_map_refseq="03.map_refseq.sh"
-script_assemble="04.assemble.sh"
-script_map_assembly="05.map_assembly.sh"
-script_polish="06.polish.sh"
-
-
 # apply definitions above in SLURM script files
-list_script+="$script_basecall"
-list_script+=" $script_filter"
-list_script+=" $script_map_refseq"
-list_script+=" $script_assemble"
-list_script+=" $script_map_assembly"
-list_script+=" $script_polish"
-sed -i "s;#SBATCH --account=.*;#SBATCH --account=$account;g" $list_script
-sed -i "s;^ *sample=.*;sample=\"$sample\";g" $list_script
-sed -i "s;^ *group=.*;group=\"$group\";g" $list_script
-sed -i "s;^ *scratch=.*;scratch=\"$scratch\";g" $list_script
+sed -i "s;#SBATCH --account=.*;#SBATCH --account=$account;g" [01]*.sh
+sed -i "s;^ *sample=.*;sample=\"$sample\";g" [01]*.sh
+sed -i "s;^ *group=.*;group=\"$group\";g" [01]*.sh
+sed -i "s;^ *scratch=.*;scratch=\"$scratch\";g" [01]*.sh
 
 # create scratch
 mkdir -p $scratch
