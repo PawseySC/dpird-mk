@@ -95,7 +95,7 @@ echo TIME align concat end $(date)
 
 # multiple alignment of selected consensus sequences
 $srun_cmd shifter run $mafft_cont mafft-linsi \
-	--thread $OMP_NUM_THREADS
+	--thread $OMP_NUM_THREADS \
 	input_align_${AID}.fasta >aligned_${AID}.fasta
 echo TIME align mafft end $(date)
 
