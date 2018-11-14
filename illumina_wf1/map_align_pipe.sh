@@ -94,11 +94,11 @@ done
 
 # prepare SLURM script for multiple alignment (if applicable)
 if [ $con_num -gt 0 ] ; then
- align_num=$(ls ${script_align/_AID/_[0-9]*/} 2>/dev/null | wc -w)
+ align_num=$(ls ${script_align/_AID/_[0-9]*} 2>/dev/null | wc -w)
  alid=$((++align_num))
  sed -e "s/AIDNUM/$alid/g" \
-  -e "s/refseq_list=.*/refseq_list=${ref_list}/g" \
-  -e "s/contig_list=.*/contig_list=${con_list}/g" \
+  -e "s/refseq_list=.*/refseq_list=\"${ref_list}\"/g" \
+  -e "s/contig_list=.*/contig_list=\"${con_list}\"/g" \
   $script_align >${script_align/_AID/_$alid}
 fi
 
@@ -114,6 +114,10 @@ if [ $new_num -gt 0 ] ; then
 fi
 # multiple alignment (if applicable)
 if [ $con_num -gt 0 ] ; then
-jobid_align=$(  sbatch --parsable --dependency=afterok:$list_jobid ${script_align/_AID/_$alid}         | cut -d ";" -f 1 )
-echo Submitted script ${script_align/_AID/_$alid} with job ID $jobid_align
+ if [ $new_num -gt 0 ] ; then
+  jobid_align=$(  sbatch --parsable --dependency=afterok"$list_jobid" ${script_align/_AID/_$alid}         | cut -d ";" -f 1 )
+ else
+  jobid_align=$(  sbatch --parsable                                  ${script_align/_AID/_$alid}         | cut -d ";" -f 1 )
+ fi
+ echo Submitted script ${script_align/_AID/_$alid} with job ID $jobid_align
 fi
