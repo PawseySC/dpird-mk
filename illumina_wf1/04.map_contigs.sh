@@ -26,6 +26,14 @@ samtools_cont="dpirdmk/samtools:1.9"
 bcftools_cont="dpirdmk/bcftools:1.9"
 
 
+# copying input data to scratch
+for f in clean.fastq.gz contigs_sub.fasta ; do
+ if [ ! -f $scratch/$f ] ; then
+  cp -p $group/$f $scratch/
+ fi
+done
+
+# running
 cd $scratch
 echo Group directory : $group
 echo Scratch directory : $scratch

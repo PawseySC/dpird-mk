@@ -26,6 +26,15 @@ srun_cmd="srun --export=all"
 mafft_cont="quay.io/biocontainers/mafft:7.407--0"
 
 
+# copying input data to scratch
+cd $group
+for f in consensus_contigs_sub.fasta $(ls consensus_contig_*.fasta 2>/dev/null) $(ls consensus_refseq_*.fasta 2>/dev/null) ; do
+ if [ ! -f $scratch/$f ] ; then
+  cp -p $group/$f $scratch/
+ fi
+done
+
+# running
 cd $scratch
 echo Group directory : $group
 echo Scratch directory : $scratch
@@ -81,14 +90,14 @@ echo align list of refseq files : ${consensus_refseq_list}
 echo TIME align refseq end $(date)
 
 # building fasta input for mafft
-cat $consensus_refseq_list $consensus_contig_list >mafft_input_${AID}.fasta
+cat $consensus_refseq_list $consensus_contig_list >input_align_${AID}.fasta
 echo TIME align concat end $(date)
 
 # multiple alignment of selected consensus sequences
 $srun_cmd shifter run $mafft_cont mafft-linsi \
 	--thread $OMP_NUM_THREADS
-	mafft_input_${AID}.fasta >aligned_${AID}.fasta
+	input_align_${AID}.fasta >aligned_${AID}.fasta
 echo TIME align mafft end $(date)
 
 # copying output data back to group
-cp -p $scratch/consensus_contig_*.fasta $scratch/mafft_input_${AID}.fasta $scratch/aligned_${AID}.fasta $group/
+cp -p $scratch/consensus_contig_*.fasta $scratch/input_align_${AID}.fasta $scratch/aligned_${AID}.fasta $group/

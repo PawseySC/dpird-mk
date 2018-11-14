@@ -25,6 +25,14 @@ bbmap_cont="quay.io/biocontainers/bbmap:38.20--h470a237_0"
 fastqc_cont="quay.io/biocontainers/fastqc:0.11.7--4"
 
 
+# copying input data to scratch
+for f in merged.fastq.gz ; do
+ if [ ! -f $scratch/$f ] ; then
+  cp -p $group/$f $scratch/
+ fi
+done
+
+# running
 cd $scratch
 echo Group directory : $group
 echo Scratch directory : $scratch

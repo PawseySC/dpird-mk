@@ -24,6 +24,14 @@ srun_cmd="srun --export=all"
 blast_cont="quay.io/biocontainers/blast:2.7.1--h96bfa4b_5"
 
 
+# copying input data to scratch
+for f in contigs_sub.fasta ; do
+ if [ ! -f $scratch/$f ] ; then
+  cp -p $group/$f $scratch/
+ fi
+done
+
+# running
 cd $scratch
 echo Group directory : $group
 echo Scratch directory : $scratch
