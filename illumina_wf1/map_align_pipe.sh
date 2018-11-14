@@ -22,8 +22,8 @@ scratch="$basescratch/$sample"
 
 
 # SLURM script names
-script_map_refseq="06.map_refseq_X.sh"
-script_multi_align="07.multi_align.sh"
+script_map_refseq="06.map_refseq_MID.sh"
+script_align="07.align_AID.sh"
 # input file name(s)
 read_file="clean.fastq.gz"
 # file where list of SeqIDs from blasting is created
@@ -44,7 +44,7 @@ fi
 
 # apply definitions above in SLURM script files
 list_script+="$script_map_refseq"
-list_script+=" $script_multi_align"
+list_script+=" $script_align"
 sed -i "s;#SBATCH --account=.*;#SBATCH --account=$account;g" $list_script
 sed -i "s;^ *sample=.*;sample=\"$sample\";g" $list_script
 sed -i "s;^ *group=.*;group=\"$group\";g" $list_script
@@ -57,24 +57,24 @@ echo Group directory : $group
 echo Scratch directory : $scratch
 
 # generate required refseq SLURM scripts
-numrefs=$(ls ${script_map_refseq/_X/_[0-9]*} 2>/dev/null | wc -l)
+numrefs=$(ls ${script_map_refseq/_MID/_[0-9]*} 2>/dev/null | wc -w)
 if [ $numrefs -eq 0 ] ; then
  rm -f $idlist_file
 fi
 for (( i=1 ; i <= $# ; i++ )) ; do 
  scid=$((numrefs+i))
- sed -e "s/seqid=.*/seqid=${!i}/g" -e "s/refseq_X/refseq_$scid/g" $script_map_refseq >${script_map_refseq/_X/_$scid}
- echo SeqID ${!i} to script ${script_map_refseq/_X/_$scid} >>$idlist_file
+ sed -e "s/seqid=.*/seqid=${!i}/g" -e "s/MIDNUM/$scid/g" $script_map_refseq >${script_map_refseq/_MID/_$scid}
+ echo SeqID ${!i} to script ${script_map_refseq/_MID/_$scid} >>$idlist_file
 done
 
 # workflow of job submissions
 # maps to refseq
 for (( i=1 ; i <= $# ; i++ )) ; do
  scid=$((numrefs+i))
- jobid_map_refseq=$( sbatch --parsable                                  ${script_map_refseq/_X/_$scid} | cut -d ";" -f 1 )
+ jobid_map_refseq=$( sbatch --parsable                                  ${script_map_refseq/_MID/_$scid} | cut -d ";" -f 1 )
  list_jobid+=:$jobid_map_refseq
- echo Submitted script ${script_map_refseq/_X/_$scid} with job ID $jobid_map_refseq
+ echo Submitted script ${script_map_refseq/_MID/_$scid} with job ID $jobid_map_refseq
 done
 # multiple alignment
-#jobid_multi_align=$(  sbatch --parsable --dependency=afterok:$list_jobid $script_multi_align         | cut -d ";" -f 1 )
-#echo Submitted script $script_multi_align with job ID $jobid_multi_align
+#jobid_align=$(  sbatch --parsable --dependency=afterok:$list_jobid $script_align         | cut -d ";" -f 1 )
+#echo Submitted script $script_align with job ID $jobid_align

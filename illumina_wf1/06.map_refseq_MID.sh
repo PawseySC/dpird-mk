@@ -1,6 +1,6 @@
 #!/bin/bash -l
 
-#SBATCH --job-name=map_refseq_X
+#SBATCH --job-name=map_refseq_MIDNUM
 #SBATCH --output=%x.out
 #SBATCH --account=director2091
 #SBATCH --clusters=zeus
@@ -12,6 +12,8 @@
 #SBATCH --mem=10G
 #SBATCH --export=NONE 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
+
+MID="MIDNUM"
 
 # sample id and working directories
 sample=
@@ -32,59 +34,61 @@ echo Group directory : $group
 echo Scratch directory : $scratch
 echo SLURM job id : $SLURM_JOB_ID
 
-# get ref sequence from BLAST db
-seqid="$(head -1 blast_contigs_sub.tsv | cut -f 2)"
+seqid=
+echo map_refseq run number : ${MID}
+echo map_refseq refseq ID : ${seqid}
 
+# get ref sequence from BLAST db
 echo TIME map_refseq blastdb start $(date)
 $srun_cmd shifter run $blast_cont  blastdbcmd \
 	-db /group/data/blast/nt -entry $seqid \
 	-line_length 60 \
-	-out refseq_X.fasta
+	-out refseq_${MID}.fasta
 echo TIME map_refseq blastdb end $(date)
 
-echo Header for refseq is : $( grep '^>' refseq_X.fasta )
-sed -i '/^>/ s/ .*//g' refseq_X.fasta
+echo Header for refseq is : $( grep '^>' refseq_${MID}.fasta )
+sed -i '/^>/ s/ .*//g' refseq_${MID}.fasta
 echo TIME map_refseq header end $(date)
 
 # alignment (sorted BAM file as final output)
 echo TIME map_refseq bbmap start $(date)
 $srun_cmd shifter run $bbmap_cont bbmap.sh \
-	in=clean.fastq.gz ref=refseq_X.fasta out=mapped_refseq_X_unsorted.sam \
+	in=clean.fastq.gz ref=refseq_${MID}.fasta out=mapped_refseq_${MID}_unsorted.sam \
 	k=13 maxindel=16000 ambig=random \
 	threads=$OMP_NUM_THREADS
 echo TIME map_refseq bbmap end $(date)
 
 $srun_cmd shifter run $samtools_cont samtools \
-	view -b -o mapped_refseq_X_unsorted.bam mapped_refseq_X_unsorted.sam
+	view -b -o mapped_refseq_${MID}_unsorted.bam mapped_refseq_${MID}_unsorted.sam
 echo TIME map_refseq sam view end $(date)
 
 $srun_cmd shifter run $samtools_cont samtools \
-	sort -o mapped_refseq_X.bam mapped_refseq_X_unsorted.bam
+	sort -o mapped_refseq_${MID}.bam mapped_refseq_${MID}_unsorted.bam
 echo TIME map_refseq sam sort end $(date)
 
 $srun_cmd shifter run $samtools_cont samtools \
-	index mapped_refseq_X.bam
+	index mapped_refseq_${MID}.bam
 echo TIME map_refseq sam index end $(date)
 
 # depth data into text file
 $srun_cmd shifter run $samtools_cont samtools \
-    depth -aa mapped_refseq_X.bam >depth_refseq_X.dat
+    depth -aa mapped_refseq_${MID}.bam >depth_refseq_${MID}.dat
 echo TIME map_refseq sam depth end $(date)
 
 # creating consensus sequence
 $srun_cmd shifter run $bcftools_cont bcftools \
-    mpileup -Ou -f refseq_X.fasta mapped_refseq_X.bam \
+    mpileup -Ou -f refseq_${MID}.fasta mapped_refseq_${MID}.bam \
     | shifter run $bcftools_cont bcftools \
-    call --ploidy 1 -mv -Oz -o calls_refseq_X.vcf.gz
+    call --ploidy 1 -mv -Oz -o calls_refseq_${MID}.vcf.gz
 echo TIME map_refseq bcf mpileup/call end $(date)
 
 $srun_cmd shifter run $bcftools_cont bcftools \
-    tabix calls_refseq_X.vcf.gz
+    tabix calls_refseq_${MID}.vcf.gz
 echo TIME map_refseq bcf tabix end $(date)
 
 $srun_cmd shifter run $bcftools_cont bcftools \
-    consensus -f refseq_X.fasta -o consensus_refseq_X.fasta calls_refseq_X.vcf.gz
+    consensus -f refseq_${MID}.fasta -o consensus_refseq_${MID}.fasta calls_refseq_${MID}.vcf.gz
 echo TIME map_refseq bcf consensus end $(date)
 
 # copying output data back to group
-cp -p $scratch/refseq_X.fasta $scratch/mapped_refseq_X.bam* $scratch/depth_refseq_X.dat $scratch/consensus_refseq_X.fasta $group/
+cp -p $scratch/refseq_${MID}.fasta $scratch/mapped_refseq_${MID}.bam* $scratch/depth_refseq_${MID}.dat $scratch/consensus_refseq_${MID}.fasta $group/
