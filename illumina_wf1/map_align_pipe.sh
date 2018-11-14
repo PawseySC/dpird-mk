@@ -26,13 +26,19 @@ script_map_refseq="06.map_refseq_MID.sh"
 script_align="07.align_AID.sh"
 # input file name(s)
 read_file="clean.fastq.gz"
-# file where list of SeqIDs from blasting is created
-idlist_file="list_seqids"
+# prefix/suffix of map_refseq consensus output files
+prefix_map="consensus_refseq"
+suffix_map="fasta"
 
 
 # check for command arguments
 if [ $# -eq 0 ] ; then
- echo "You need to provide at least one SeqID (from the BLAST output) as argument. Exiting."
+ echo "There are two usage modes for this script."
+ echo "1. Map reads to a set of reference sequences; "
+ echo "   as argument, provide at least one refseq ID (from the BLAST output)."
+ echo "2. Map reads to ref. sequences, then perform multiple alignment between those and a set of contig sequences; "
+ echo "   as argument, provide at least one refseq ID (from the BLAST output) and one contig ID (from the assembled contigs file)."
+ echo "No arguments provided. Exiting."
  exit
 fi
 
@@ -43,8 +49,8 @@ if [ ! -s $read_file ] ; then
 fi
 
 # apply definitions above in SLURM script files
-list_script+="$script_map_refseq"
-list_script+=" $script_align"
+list_script+="${script_map_refseq/_MID/_*}"
+list_script+=" ${script_align/_AID/_*}"
 sed -i "s;#SBATCH --account=.*;#SBATCH --account=$account;g" $list_script
 sed -i "s;^ *sample=.*;sample=\"$sample\";g" $list_script
 sed -i "s;^ *group=.*;group=\"$group\";g" $list_script
@@ -56,25 +62,58 @@ mkdir -p $scratch
 echo Group directory : $group
 echo Scratch directory : $scratch
 
-# generate required refseq SLURM scripts
-numrefs=$(ls ${script_map_refseq/_MID/_[0-9]*} 2>/dev/null | wc -w)
-if [ $numrefs -eq 0 ] ; then
- rm -f $idlist_file
+# classify input arguments
+arg_list="$@"
+ref_list=$(echo $arg_list | xargs -n 1 | grep -v NODE | xargs)
+ref_num=$( echo $ref_list | wc -w)
+con_list=$(echo $arg_list | xargs -n 1 | grep NODE | xargs)
+con_num=$( echo $con_list | wc -w)
+if [ $ref_num -eq 0 ] ; then
+ echo "At least one refseq ID (from the BLAST output) is required. Exiting."
+ exit
 fi
-for (( i=1 ; i <= $# ; i++ )) ; do 
- scid=$((numrefs+i))
- sed -e "s/seqid=.*/seqid=${!i}/g" -e "s/MIDNUM/$scid/g" $script_map_refseq >${script_map_refseq/_MID/_$scid}
- echo SeqID ${!i} to script ${script_map_refseq/_MID/_$scid} >>$idlist_file
+
+# generate required refseq SLURM scripts
+refseq_files=$(ls ${prefix_map}_*.${suffix_map} 2>/dev/null)
+refseq_num=$(echo $refseq_files | wc -w)
+new_num=0
+for id in $ref_list ; do
+ found=0
+ for file in $refseq_files ; do
+  found=$(grep -c ">$id" $file)
+  if [ "$found" == "1" ] ; then
+   break
+  fi
+ done
+ if [ "$found" == "0" ] ; then
+  : $((++new_num))
+  newid=$((refseq_num+new_num))
+  sed -e "s/MIDNUM/$newid/g" -e "s/seqid=.*/seqid=${id}/g" $script_map_refseq >${script_map_refseq/_MID/_$newid}
+ fi
 done
+
+# prepare SLURM script for multiple alignment (if applicable)
+if [ $con_num -gt 0 ] ; then
+ align_num=$(ls ${script_align/_AID/_[0-9]*/} 2>/dev/null | wc -w)
+ alid=$((++align_num))
+ sed -e "s/AIDNUM/$alid/g" \
+  -e "s/refseq_list=.*/refseq_list=${ref_list}/g" \
+  -e "s/contig_list=.*/contig_list=${con_list}/g" \
+  $script_align >${script_align/_AID/_$alid}
+fi
 
 # workflow of job submissions
 # maps to refseq
-for (( i=1 ; i <= $# ; i++ )) ; do
- scid=$((numrefs+i))
- jobid_map_refseq=$( sbatch --parsable                                  ${script_map_refseq/_MID/_$scid} | cut -d ";" -f 1 )
- list_jobid+=:$jobid_map_refseq
- echo Submitted script ${script_map_refseq/_MID/_$scid} with job ID $jobid_map_refseq
-done
-# multiple alignment
-#jobid_align=$(  sbatch --parsable --dependency=afterok:$list_jobid $script_align         | cut -d ";" -f 1 )
-#echo Submitted script $script_align with job ID $jobid_align
+if [ $new_num -gt 0 ] ; then
+ for (( i=1 ; i <= $new_num ; i++ )) ; do
+  newid=$((refseq_num+i))
+  jobid_map_refseq=$( sbatch --parsable                                  ${script_map_refseq/_MID/_$newid} | cut -d ";" -f 1 )
+  list_jobid+=:$jobid_map_refseq
+  echo Submitted script ${script_map_refseq/_MID/_$newid} with job ID $jobid_map_refseq
+ done
+fi
+# multiple alignment (if applicable)
+if [ $con_num -gt 0 ] ; then
+jobid_align=$(  sbatch --parsable --dependency=afterok:$list_jobid ${script_align/_AID/_$alid}         | cut -d ";" -f 1 )
+echo Submitted script ${script_align/_AID/_$alid} with job ID $jobid_align
+fi
