@@ -63,6 +63,7 @@ echo TIME map_refseq bbmap start $(date)
 $srun_cmd shifter run $bbmap_cont bbmap.sh \
 	in=clean.fastq.gz ref=refseq_${MID}.fasta out=mapped_refseq_${MID}_unsorted.sam \
 	k=13 maxindel=16000 ambig=random \
+	path=ref_${MID} \
 	threads=$OMP_NUM_THREADS
 echo TIME map_refseq bbmap end $(date)
 
