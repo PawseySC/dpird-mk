@@ -3,19 +3,28 @@
 echo "WARNING: this is a script to delete files. This can results in unwanted data loss. Handle with care!"
 
 dir=$(pwd)
+dirg=$dir
 rootdir=${dir#/}
 rootdir=${rootdir%%/*}
 
 if [ "$rootdir" != "scratch" ] ; then
- echo ""
- echo "Current location "$dir" is not under scratch. Exiting."
- echo "NOTE: no files have been deleted."
- exit
+ if [ "$rootdir" == "group" ] ; then
+  echo ""
+  echo "Current location "$dir" is under group."
+  dir=${dir/group/scratch}
+  echo "Pipeline scripts still searched in "$dirg
+  echo "Switching to same directory structure under scratch for deletion: "$dir
+ else
+  echo ""
+  echo "Current location "$dir" is not under scratch nor group. Exiting."
+  echo "NOTE: no files have been deleted."
+  exit
+ fi
 fi
 
-if [ ! -s $dir/upstream_pipe.sh ] && [ ! -s $dir/nanopore_pipe.sh ] ; then
+if [ ! -s $dirg/upstream_pipe.sh ] && [ ! -s $dirg/nanopore_pipe.sh ] ; then
  echo ""
- echo "Current location "$dir" seems not to be an illumina/nanopore workflow scratch directory. Exiting."
+ echo "Current location "$dirg" seems not to be an illumina/nanopore workflow scratch directory. Exiting."
  echo "NOTE: no files have been deleted."
  exit
 fi
