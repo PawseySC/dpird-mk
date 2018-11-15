@@ -1,11 +1,10 @@
 ## Dockerfiles created for this uptake project
 
-A copy of the Dockerfiles developed during this project has been put in this directory, 
-for the following packages:
+Dockerfiles have been developed during this project for the following packages:
 
 - Illumina pipeline:
-	- samtools
-	- bcftools
+	- [samtools](https://github.com/marcodelapierre/md-dockerfiles/blob/master/bio/samtools/Dockerfile)
+	- [bcftools](https://github.com/marcodelapierre/md-dockerfiles/blob/master/bio/bcftools/Dockerfile)
 
 - Nanopore pipeline:
-	- pomoxis
+	- [pomoxis](https://github.com/marcodelapierre/md-dockerfiles/blob/master/bio/pomoxis/Dockerfile)
