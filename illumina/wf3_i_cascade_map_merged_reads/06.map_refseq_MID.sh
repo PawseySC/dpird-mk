@@ -108,4 +108,4 @@ $srun_cmd shifter run $bcftools_cont bcftools \
 echo TIME map_refseq bcf consensus end $(date)
 
 # copying output data back to group
-cp -p $scratch/refseq_${MID}.fasta $scratch/mapped_refseq_${MID}.bam* $scratch/depth_refseq_${MID}.dat $scratch/consensus_refseq_${MID}.fasta $group/
+cp -p $scratch/refseq_${MID}.fasta $scratch/mapped_refseq_${MID}.bam* $scratch/unmapped_refseq_${MID}.fastq.gz $scratch/depth_refseq_${MID}.dat $scratch/consensus_refseq_${MID}.fasta $group/
