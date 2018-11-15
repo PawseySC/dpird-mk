@@ -44,6 +44,7 @@ echo TIME map_contigs bbmap start $(date)
 $srun_cmd shifter run $bbmap_cont bbmap.sh \
 	in=clean.fastq.gz ref=contigs_sub.fasta \
 	out=mapped_contigs_sub_unsorted.sam \
+	interleaved=t \
 	k=13 maxindel=16000 ambig=random \
 	threads=$OMP_NUM_THREADS
 echo TIME map_contigs bbmap end $(date)
