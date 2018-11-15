@@ -28,9 +28,15 @@ bbmap_cont="quay.io/biocontainers/bbmap:38.20--h470a237_0"
 samtools_cont="dpirdmk/samtools:1.9"
 bcftools_cont="dpirdmk/bcftools:1.9"
 
+# input depending on run ID
+if [ "$MID" == "1" ] ; then
+ map_input="clean.fastq.gz"
+else
+ map_input="unmapped_refseq_$((MID-1)).fastq.gz"
+fi
 
 # copying input data to scratch
-for f in clean.fastq.gz ; do
+for f in $map_input ; do
  if [ ! -f $scratch/$f ] ; then
   cp -p $group/$f $scratch/
  fi
@@ -61,8 +67,9 @@ echo TIME map_refseq header end $(date)
 # alignment (sorted BAM file as final output)
 echo TIME map_refseq bbmap start $(date)
 $srun_cmd shifter run $bbmap_cont bbmap.sh \
-	in=clean.fastq.gz ref=refseq_${MID}.fasta \
+	in=$map_input ref=refseq_${MID}.fasta \
 	out=mapped_refseq_${MID}_unsorted.sam \
+	outu=unmapped_refseq_${MID}.fastq.gz \
 	k=13 maxindel=16000 ambig=random \
 	path=ref_${MID} \
 	threads=$OMP_NUM_THREADS

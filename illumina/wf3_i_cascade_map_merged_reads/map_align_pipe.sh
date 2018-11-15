@@ -105,19 +105,21 @@ fi
 # workflow of job submissions
 # maps to refseq
 if [ $new_num -gt 0 ] ; then
- for (( i=1 ; i <= $new_num ; i++ )) ; do
+ newid=$((refseq_num+1))
+ jobid_map_refseq=$(  sbatch --parsable                                        ${script_map_refseq/_MID/_$newid} | cut -d ";" -f 1 )
+ echo Submitted script ${script_map_refseq/_MID/_$newid} with job ID $jobid_map_refseq
+ for (( i=2 ; i <= $new_num ; i++ )) ; do
   newid=$((refseq_num+i))
-  jobid_map_refseq=$( sbatch --parsable                                   ${script_map_refseq/_MID/_$newid} | cut -d ";" -f 1 )
-  list_jobid+=:$jobid_map_refseq
+  jobid_map_refseq=$( sbatch --parsable --dependency=afterok:$jobid_map_refseq ${script_map_refseq/_MID/_$newid} | cut -d ";" -f 1 )
   echo Submitted script ${script_map_refseq/_MID/_$newid} with job ID $jobid_map_refseq
  done
 fi
 # multiple alignment (if applicable)
 if [ $con_num -gt 0 ] ; then
  if [ $new_num -gt 0 ] ; then
-  jobid_align=$(      sbatch --parsable --dependency=afterok"$list_jobid" ${script_align/_AID/_$alid}       | cut -d ";" -f 1 )
+  jobid_align=$(      sbatch --parsable --dependency=afterok:$jobid_map_refseq ${script_align/_AID/_$alid}       | cut -d ";" -f 1 )
  else
-  jobid_align=$(      sbatch --parsable                                   ${script_align/_AID/_$alid}       | cut -d ";" -f 1 )
+  jobid_align=$(      sbatch --parsable                                        ${script_align/_AID/_$alid}       | cut -d ";" -f 1 )
  fi
  echo Submitted script ${script_align/_AID/_$alid} with job ID $jobid_align
 fi
