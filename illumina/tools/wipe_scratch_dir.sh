@@ -1,37 +1,33 @@
 #!/bin/bash
 
-echo "WARNING: this is a script to delete files. This can results in unwanted data loss. Handle with care!"
+echo "WARNING: this is a script to delete files. This can result in unwanted data loss. Handle with care!"
 
 dir=$(pwd)
-dirg=$dir
+dirgr=${dir/scratch/group}
+dirsc=${dir/group/scratch}
 rootdir=${dir#/}
 rootdir=${rootdir%%/*}
 
-if [ "$rootdir" != "scratch" ] ; then
- if [ "$rootdir" == "group" ] ; then
-  echo ""
-  echo "Current location "$dir" is under group."
-  dir=${dir/group/scratch}
-  echo "Pipeline scripts still searched in "$dirg
-  echo "Switching to same directory structure under scratch for deletion: "$dir
- else
-  echo ""
-  echo "Current location "$dir" is not under scratch nor group. Exiting."
-  echo "NOTE: no files have been deleted."
-  exit
- fi
+if [ "$rootdir" != "scratch" ] && [ "$rootdir" != "group" ] ; then
+ echo ""
+ echo "Current location "$dir" is not under scratch nor group. Exiting."
+ echo "NOTE: no files have been deleted."
+ exit
 fi
 
-if [ ! -s $dirg/upstream_pipe.sh ] && [ ! -s $dirg/nanopore_pipe.sh ] ; then
+if [ ! -s "$dirgr/upstream_pipe.sh" ] && [ ! -s "$dirgr/nanopore_pipe.sh" ] ; then
  echo ""
- echo "Current location "$dirg" seems not to be an illumina/nanopore workflow scratch directory. Exiting."
+ echo "Current location "$dirsc" seems not to be an illumina/nanopore workflow scratch directory. Exiting."
  echo "NOTE: no files have been deleted."
  exit
 fi
 
 echo ""
+echo "Group   dir is: "$dirgr
+echo "Scratch dir is: "$dirsc
+echo ""
 echo "About to delete the contents of the following directory:"
-echo "$dir"
+echo "$dirsc"
 echo ""
 echo "Are you sure you want to proceed? [yes | NO]"
 
@@ -41,12 +37,12 @@ answer=$( echo $answer | tr '[:upper:]' '[:lower:]' )
 if [ "$answer" == "y" ] || [ "$answer" == "yes" ] ; then
 
  echo ""
- rm -r ${dir}/*
+ rm -r ${dirsc}/*
  echo "KABOOOM!"
  if [ "$?" == "0" ] ; then
-  echo "DONE: Files in "$dir" have been deleted. Exiting."
+  echo "DONE: Files in "$dirsc" have been deleted. Exiting."
  else
-  echo "NOTE: not all files in "$dir" have been deleted. Have a look. Exiting."
+  echo "NOTE: not all files in "$dirsc" have been deleted. Have a look. Exiting."
  fi
  exit
 
