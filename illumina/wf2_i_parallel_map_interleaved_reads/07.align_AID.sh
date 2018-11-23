@@ -30,8 +30,8 @@ mafft_cont="quay.io/biocontainers/mafft:7.407--0"
 # copying input data to scratch
 cd $group
 for f in consensus_contigs_sub.fasta \
-	$(ls consensus_contig_*.fasta | xargs -n 1 |grep -v '_rc\.' | xargs 2>/dev/null) \
-	$(ls consensus_refseq_*.fasta | xargs -n 1 |grep -v '_rc\.' | xargs 2>/dev/null) ; do
+	$(ls consensus_contig_*.fasta 2>/dev/null | xargs -n 1 | grep -v '_rc\.' | xargs) \
+	$(ls consensus_refseq_*.fasta 2>/dev/null | xargs -n 1 | grep -v '_rc\.' | xargs) ; do
  if [ ! -f $scratch/$f ] ; then
   cp -p $group/$f $scratch/
  fi

@@ -74,7 +74,7 @@ if [ $ref_num -eq 0 ] ; then
 fi
 
 # generate required refseq SLURM scripts
-refseq_files=$(ls ${prefix_map}_*.${suffix_map} | xargs -n 1 |grep -v '_rc\.' | xargs 2>/dev/null)
+refseq_files=$(ls ${prefix_map}_*.${suffix_map} 2>/dev/null | xargs -n 1 | grep -v '_rc\.' | xargs)
 refseq_num=$(echo $refseq_files | wc -w)
 new_num=0
 for id in $ref_list ; do
