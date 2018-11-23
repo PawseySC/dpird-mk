@@ -26,9 +26,7 @@ spades_cont="quay.io/biocontainers/spades:3.12.0--1"
 
 # copying input data to scratch
 for f in clean.fastq.gz ; do
- if [ ! -f $scratch/$f ] ; then
-  cp -p $group/$f $scratch/
- fi
+ cp -p $group/$f $scratch/
 done
 
 # running

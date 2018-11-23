@@ -27,9 +27,7 @@ fastqc_cont="quay.io/biocontainers/fastqc:0.11.7--4"
 
 # copying input data to scratch
 for f in interleaved.fastq.gz ; do
- if [ ! -f $scratch/$f ] ; then
-  cp -p $group/$f $scratch/
- fi
+ cp -p $group/$f $scratch/
 done
 
 # running

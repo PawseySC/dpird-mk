@@ -37,9 +37,7 @@ fi
 
 # copying input data to scratch
 for f in $map_input ; do
- if [ ! -f $scratch/$f ] ; then
-  cp -p $group/$f $scratch/
- fi
+ cp -p $group/$f $scratch/
 done
 
 # running

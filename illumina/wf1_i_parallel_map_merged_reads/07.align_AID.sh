@@ -32,9 +32,7 @@ cd $group
 for f in consensus_contigs_sub.fasta \
 	$(ls consensus_contig_*.fasta 2>/dev/null | xargs -n 1 | grep -v '_rc\.' | xargs) \
 	$(ls consensus_refseq_*.fasta 2>/dev/null | xargs -n 1 | grep -v '_rc\.' | xargs) ; do
- if [ ! -f $scratch/$f ] ; then
-  cp -p $group/$f $scratch/
- fi
+ cp -p $group/$f $scratch/
 done
 # remove _rc.fasta from scratch
 rm -f $scratch/consensus_contig_*_rc.fasta $scratch/consensus_refseq_*_rc.fasta

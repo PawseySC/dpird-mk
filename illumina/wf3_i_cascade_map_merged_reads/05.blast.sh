@@ -38,9 +38,7 @@ fi
 
 # copying input data to scratch
 for f in ${prefix_contig}.fasta ; do
- if [ ! -f $scratch/$f ] ; then
-  cp -p $group/$f $scratch/
- fi
+ cp -p $group/$f $scratch/
 done
 
 # running
