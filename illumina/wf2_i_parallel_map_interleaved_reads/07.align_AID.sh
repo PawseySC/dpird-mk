@@ -51,7 +51,7 @@ contig_num=$(echo $contig_files | wc -w)
 for id in $contig_list ; do
  found=0
  for file in $contig_files ; do
-  found=$(grep -c ">$id" $file)
+  found=$(grep -c ">${id}_" $file)
   if [ "$found" == "1" ] ; then
    consensus_contig_list+=" $file"
    break
