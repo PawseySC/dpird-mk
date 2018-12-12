@@ -22,6 +22,7 @@ scratch="$basescratch/$sample"
 
 
 # SLURM script names
+script_copy_fast5="00.copy_fast5.sh"
 script_basecall="01.basecall.np.sh"
 script_filter="02.filter.np.sh"
 script_map_refseq="03.map_refseq.sh"
@@ -39,7 +40,8 @@ if [ ! -d $read_dir ] ; then
 fi
 
 # apply definitions above in SLURM script files
-list_script+="$script_basecall"
+list_script+="$script_copy_fast5"
+list_script+=" $script_basecall"
 list_script+=" $script_filter"
 list_script+=" $script_map_refseq"
 list_script+=" $script_assemble"
@@ -57,8 +59,11 @@ echo Group directory : $group
 echo Scratch directory : $scratch
 
 # workflow of job submissions
+# copy_fast5
+jobid_copy_fast5=$(   sbatch --parsable                                          $script_copy_fast5   | cut -d ";" -f 1 )
+echo Submitted script $script_copy_fast5 with job ID $jobid_copy_fast5
 # basecall
-jobid_basecall=$(     sbatch --parsable                                          $script_basecall     | cut -d ";" -f 1 )
+jobid_basecall=$(     sbatch --parsable --dependency=afterok:$jobid_copy_fast5   $script_basecall     | cut -d ";" -f 1 )
 echo Submitted script $script_basecall with job ID $jobid_basecall
 # filter
 jobid_filter=$(       sbatch --parsable --dependency=afterok:$jobid_basecall     $script_filter       | cut -d ";" -f 1 )
