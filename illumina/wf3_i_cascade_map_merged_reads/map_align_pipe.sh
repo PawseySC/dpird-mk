@@ -27,7 +27,8 @@ script_align="07.align_AID.sh"
 # input file name(s)
 read_file="clean.fastq.gz"
 # prefix/suffix of map_refseq consensus output files
-prefix_map="consensus_refseq"
+prefix_map_in="refseq"
+prefix_map_out="consensus_refseq"
 suffix_map="fasta"
 
 
@@ -74,20 +75,31 @@ if [ $ref_num -eq 0 ] ; then
 fi
 
 # generate required refseq SLURM scripts
-refseq_files=$(ls ${prefix_map}_*.${suffix_map} 2>/dev/null)
+refseq_files=$(ls ${prefix_map_in}_*.${suffix_map} 2>/dev/null)
 refseq_num=$(echo $refseq_files | wc -w)
-new_num=0
+if [ $refseq_num -gt 0 ] ; then
+ upper_num=$(for f in $refseq_files ; do tag=${f#${prefix_map_in}_} ; tag=${tag%.${suffix_map}} ; echo $tag ; done |sort -n -k 1 -r |head -1)
+else
+ upper_num=0
+fi
 for id in $ref_list ; do
  found=0
  for file in $refseq_files ; do
   found=$(grep -c ">$id" $file)
   if [ "$found" == "1" ] ; then
+   if [ ! -s ${prefix_map_out}${file#${prefix_map_in}} ] ; then
+    newid=${file#${prefix_map_in}_}
+    newid=${newid%.${suffix_map}}
+    list_newid+="${newid} "
+    sed -e "s/MIDNUM/$newid/g" -e "s/seqid=.*/seqid=${id}/g" $script_map_refseq >${script_map_refseq/_MID/_$newid}
+   fi
    break
   fi
  done
  if [ "$found" == "0" ] ; then
-  : $((++new_num))
-  newid=$((refseq_num+new_num))
+  : $((++upper_num))
+  newid=${upper_num}
+  list_newid+="${newid} "
   sed -e "s/MIDNUM/$newid/g" -e "s/seqid=.*/seqid=${id}/g" $script_map_refseq >${script_map_refseq/_MID/_$newid}
  fi
 done
@@ -104,19 +116,16 @@ fi
 
 # workflow of job submissions
 # maps to refseq
-if [ $new_num -gt 0 ] ; then
- newid=$((refseq_num+1))
+ newid=$(echo $list_newid |cut -d " " -f 1)
  jobid_map_refseq=$(  sbatch --parsable                                        ${script_map_refseq/_MID/_$newid} | cut -d ";" -f 1 )
  echo Submitted script ${script_map_refseq/_MID/_$newid} with job ID $jobid_map_refseq
- for (( i=2 ; i <= $new_num ; i++ )) ; do
-  newid=$((refseq_num+i))
+ for newid in $(echo $list_newid |cut -d " " -f 1 --complement) ; do
   jobid_map_refseq=$( sbatch --parsable --dependency=afterok:$jobid_map_refseq ${script_map_refseq/_MID/_$newid} | cut -d ";" -f 1 )
   echo Submitted script ${script_map_refseq/_MID/_$newid} with job ID $jobid_map_refseq
  done
-fi
 # multiple alignment (if applicable)
 if [ $con_num -gt 0 ] ; then
- if [ $new_num -gt 0 ] ; then
+ if [ "$list_newid" != "" ] ; then
   jobid_align=$(      sbatch --parsable --dependency=afterok:$jobid_map_refseq ${script_align/_AID/_$alid}       | cut -d ";" -f 1 )
  else
   jobid_align=$(      sbatch --parsable                                        ${script_align/_AID/_$alid}       | cut -d ";" -f 1 )

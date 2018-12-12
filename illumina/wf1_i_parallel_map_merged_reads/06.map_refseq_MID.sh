@@ -33,6 +33,7 @@ bcftools_cont="dpirdmk/bcftools:1.9"
 for f in clean.fastq.gz ; do
  cp -p $group/$f $scratch/
 done
+cp -p $group/refseq_${MID}.fasta $scratch/ 2>/dev/null
 
 # running
 cd $scratch
@@ -46,10 +47,14 @@ echo map_refseq refseq ID : ${seqid}
 
 # get ref sequence from BLAST db
 echo TIME map_refseq blastdb start $(date)
-$srun_cmd shifter run $blast_cont  blastdbcmd \
+if [ ! -s refseq_${MID}.fasta ] ; then
+ $srun_cmd shifter run $blast_cont  blastdbcmd \
 	-db /group/data/blast/nt -entry $seqid \
 	-line_length 60 \
 	-out refseq_${MID}.fasta
+else
+ echo "Refseq file refseq_${MID}.fasta already exists"
+fi
 echo TIME map_refseq blastdb end $(date)
 
 echo Header for refseq is : $( grep '^>' refseq_${MID}.fasta )
