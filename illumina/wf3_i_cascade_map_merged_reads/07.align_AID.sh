@@ -23,19 +23,14 @@ scratch="/scratch/director2091/mdelapierre/illumina/test1"
 # shifter definitions
 module load shifter
 srun_cmd="srun --export=all"
-samtools_cont="dpirdmk/samtools:1.9"
 mafft_cont="quay.io/biocontainers/mafft:7.407--0"
 
 
 # copying input data to scratch
 cd $group
-for f in consensus_contigs_sub.fasta \
-	$(ls consensus_contig_*.fasta | xargs -n 1 |grep -v '_rc\.' | xargs 2>/dev/null) \
-	$(ls consensus_refseq_*.fasta | xargs -n 1 |grep -v '_rc\.' | xargs 2>/dev/null) ; do
+for f in consensus_contigs_sub.fasta $(ls consensus_contig_*.fasta 2>/dev/null) $(ls consensus_refseq_*.fasta 2>/dev/null) ; do
  cp -p $group/$f $scratch/
 done
-# remove _rc.fasta from scratch
-rm -f $scratch/consensus_contig_*_rc.fasta $scratch/consensus_refseq_*_rc.fasta
 
 # running
 cd $scratch
@@ -52,38 +47,18 @@ echo TIME align contig start $(date)
 contig_files=$(ls consensus_contig_*.fasta 2>/dev/null)
 contig_num=$(echo $contig_files | wc -w)
 for id in $contig_list ; do
- idorig=$id
- id=${idorig%_rc}
  found=0
  for file in $contig_files ; do
   found=$(grep -c ">${id}_" $file)
   if [ "$found" == "1" ] ; then
-   if [ "${idorig: -3}" == "_rc" ] ; then
-    idsearch=$(grep ">${id}_" $file | tr -d '>')
-    $srun_cmd shifter run $samtools_cont samtools faidx \
-		-i -o ${file%.*}_rc.fasta \
-		$file $idsearch
-    consensus_contig_list+=" ${file%.*}_rc.fasta"
-   else
-    consensus_contig_list+=" $file"
-   fi
+   consensus_contig_list+=" $file"
    break
   fi
  done
  if [ "$found" == "0" ] ; then
   : $((++contig_num))
-  idsearch=$(grep ">${id}_" consensus_contigs_sub.fasta | tr -d '>')
-  $srun_cmd shifter run $samtools_cont samtools faidx \
-	-o consensus_contig_${contig_num}.fasta \
-	consensus_contigs_sub.fasta $idsearch
-  if [ "${idorig: -3}" == "_rc" ] ; then
-   $srun_cmd shifter run $samtools_cont samtools faidx \
-		-i -o consensus_contig_${contig_num}_rc.fasta \
-		consensus_contig_${contig_num}.fasta $idsearch
-   consensus_contig_list+=" consensus_contig_${contig_num}_rc.fasta"
-  else
-   consensus_contig_list+=" consensus_contig_${contig_num}.fasta"
-  fi
+  consensus_contig_list+=" consensus_contig_${contig_num}.fasta"
+  awk -F _ -v id=${id#NODE_} '{ if(ok==1){if($1==">NODE"){exit}; print} ; if(ok!=1 && $1==">NODE" && $2==id){ok=1; print} }' consensus_contigs_sub.fasta >consensus_contig_${contig_num}.fasta
  fi
 done
 echo align list of contig IDs : ${contig_list}
@@ -93,28 +68,18 @@ echo TIME align contig end $(date)
 # building list of refseq(s)
 refseq_files=$(ls consensus_refseq_*.fasta 2>/dev/null)
 for id in $refseq_list ; do
- idorig=$id
- id=${idorig%_rc}
  found=0
  for file in $refseq_files ; do
   found=$(grep -c ">$id" $file)
   if [ "$found" == "1" ] ; then
-   if [ "${idorig: -3}" == "_rc" ] ; then
-    idsearch=$(grep ">$id" $file | tr -d '>')
-    $srun_cmd shifter run $samtools_cont samtools faidx \
-        -i -o ${file%.*}_rc.fasta \
-        $file $idsearch
-    consensus_refseq_list+=" ${file%.*}_rc.fasta"
-   else
-    consensus_refseq_list+=" $file"
-   fi
+   consensus_refseq_list+=" $file"
    break
   fi
  done
  if [ "$found" == "0" ] ; then
-  echo "ERROR : refseq ID "$id" not found in existing consensus_refseq FASTA files."
+  echo ERROR : refseq ID $id not found in existing consensus_refseq FASTA files.
   echo "Re-run refseq mapping for that ID (step 06) and try again."
-  echo "Exiting now."
+  echo Exiting now.
   exit
  fi
 done
@@ -129,8 +94,8 @@ echo TIME align concat end $(date)
 # multiple alignment of selected consensus sequences
 $srun_cmd shifter run $mafft_cont mafft-linsi \
 	--thread $OMP_NUM_THREADS \
-	input_align_${AID}.fasta >output_align_${AID}.fasta
+	input_align_${AID}.fasta >aligned_${AID}.fasta
 echo TIME align mafft end $(date)
 
 # copying output data back to group
-cp -p $scratch/consensus_contig_*.fasta $scratch/consensus_refseq_*.fasta $scratch/input_align_${AID}.fasta $scratch/output_align_${AID}.fasta $group/
+cp -p $scratch/consensus_contig_*.fasta $scratch/input_align_${AID}.fasta $scratch/aligned_${AID}.fasta $group/
