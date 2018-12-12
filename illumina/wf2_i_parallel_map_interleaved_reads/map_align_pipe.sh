@@ -116,11 +116,11 @@ fi
 
 # workflow of job submissions
 # maps to refseq
- for newid in $list_newid ; do
-  jobid_map_refseq=$( sbatch --parsable                                   ${script_map_refseq/_MID/_$newid} | cut -d ";" -f 1 )
-  list_jobid+=:$jobid_map_refseq
-  echo Submitted script ${script_map_refseq/_MID/_$newid} with job ID $jobid_map_refseq
- done
+for newid in $list_newid ; do
+ jobid_map_refseq=$( sbatch --parsable                                   ${script_map_refseq/_MID/_$newid} | cut -d ";" -f 1 )
+ list_jobid+=:$jobid_map_refseq
+ echo Submitted script ${script_map_refseq/_MID/_$newid} with job ID $jobid_map_refseq
+done
 # multiple alignment (if applicable)
 if [ $con_num -gt 0 ] ; then
  if [ "$list_newid" != "" ] ; then
