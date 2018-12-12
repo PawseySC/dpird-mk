@@ -4,12 +4,12 @@
 #SBATCH --output=%x.out
 #SBATCH --account=director2091
 #SBATCH --clusters=zeus
-#SBATCH --partition=workq
+#SBATCH --partition=longq
 #SBATCH --ntasks=1
 #SBATCH --ntasks-per-node=1
-#SBATCH --cpus-per-task=16
-#SBATCH --time=24:00:00
-#SBATCH --mem=50G
+#SBATCH --cpus-per-task=28
+#SBATCH --time=4-00:00:00
+#SBATCH --mem=120G
 #SBATCH --export=NONE 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
@@ -26,7 +26,7 @@ nanoplot_cont="quay.io/biocontainers/nanoplot:1.18.2--py36_1"
 
 
 # copying input data to scratch
-cp -rp $group/fast5 $scratch/
+#cp -rp $group/fast5 $scratch/
 
 # running
 cd $scratch
@@ -42,12 +42,12 @@ $srun_cmd shifter run $albacore_cont read_fast5_basecaller.py \
 	--barcoding \
 	-f FLO-MIN106 -k SQK-LSK108 \
 	-t $OMP_NUM_THREADS
-mv workspace/pass/*.fastq pass.fastq
 echo TIME basecall end $(date)
 
 # nanoplot
-$srun_cmd shifter run $nanoplot_cont NanoPlot --fastq pass.fastq
+$srun_cmd shifter run $nanoplot_cont NanoPlot --summary sequencing_summary.txt
 echo TIME np end $(date)
 
 # copying output data back to group
-cp -rp $scratch/pass.fastq $scratch/pass $group/
+#cp -rp $scratch/workspace/pass $group/
+cp -p $scratch/*.png $scratch/NanoStats.txt $scratch/NanoPlot-report.html $group/
