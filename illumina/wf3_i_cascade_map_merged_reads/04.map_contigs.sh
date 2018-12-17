@@ -23,7 +23,7 @@ module load shifter
 srun_cmd="srun --export=all"
 bbmap_cont="quay.io/biocontainers/bbmap:38.20--h470a237_0"
 samtools_cont="dpirdmk/samtools:1.9"
-bcftools_cont="dpirdmk/bcftools:1.9"
+bcftools_cont="dpirdmk/bcftools:1.8"
 
 
 # copying input data to scratch

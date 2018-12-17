@@ -26,7 +26,7 @@ srun_cmd="srun --export=all"
 blast_cont="quay.io/biocontainers/blast:2.7.1--h96bfa4b_5"
 bbmap_cont="quay.io/biocontainers/bbmap:38.20--h470a237_0"
 samtools_cont="dpirdmk/samtools:1.9"
-bcftools_cont="dpirdmk/bcftools:1.9"
+bcftools_cont="dpirdmk/bcftools:1.8"
 
 # input depending on run ID
 if [ "$MID" == "1" ] ; then

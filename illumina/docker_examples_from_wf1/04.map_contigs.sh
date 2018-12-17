@@ -6,7 +6,7 @@ alias docker_cmd='docker run --rm -v $(pwd):/data -w /data'
 
 bbmap_cont="quay.io/biocontainers/bbmap:38.20--h470a237_0"
 samtools_cont="dpirdmk/samtools:1.9"
-bcftools_cont="dpirdmk/bcftools:1.9"
+bcftools_cont="dpirdmk/bcftools:1.8"
 
 
 # alignment (sorted BAM file as final output)

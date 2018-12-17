@@ -29,7 +29,7 @@ alias samtools_pl='shifter run $samtools_cont samtools.pl'
 alias plot_bamstats='shifter run $samtools_cont plot-bamstats'
 
 #bcftools
-export bcftools_cont='dpirdmk/bcftools:1.9'
+export bcftools_cont='dpirdmk/bcftools:1.8'
 alias bcftools_bash='shifter run $bcftools_cont bash'
 alias bcftools='shifter run $bcftools_cont bcftools'
 alias vcfutils_pl='shifter run $bcftools_cont vcfutils.pl'

@@ -31,7 +31,7 @@ alias samtools_pl='docker_it $samtools_cont samtools.pl'
 alias plot_bamstats='docker_it $samtools_cont plot-bamstats'
 
 #bcftools
-export bcftools_cont='dpirdmk/bcftools:1.9'
+export bcftools_cont='dpirdmk/bcftools:1.8'
 alias bcftools_bash='docker_it $bcftools_cont bash'
 alias bcftools='docker_it $bcftools_cont bcftools'
 alias vcfutils_pl='docker_it $bcftools_cont vcfutils.pl'
