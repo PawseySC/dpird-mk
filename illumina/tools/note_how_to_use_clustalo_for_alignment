@@ -1,0 +1,18 @@
+# pull the container (one-off)
+sg $PAWSEY_PROJECT -c "shifter pull biocontainers/clustal-omega:v1.2.1-1_cv3"
+
+
+# modify the script 07.align_AID.sh
+
+# 1) to be added on top, after
+# module load shifter
+# srun_cmd="srun --export=all"
+clustalo_cont=biocontainers/clustal-omega:v1.2.1-1_cv3
+
+# 2) to be added towards the end, in substitution of the mafft execution block
+$srun_cmd shifter run $clustalo_cont clustalo \
+    -v \
+    -i input_align_${AID}.fasta -o aligned_${AID}.fasta \
+    --auto --threads=$OMP_NUM_THREADS
+echo TIME align clustalo end $(date)
+
