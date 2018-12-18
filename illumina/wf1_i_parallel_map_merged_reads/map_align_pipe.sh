@@ -88,19 +88,19 @@ for id in $ref_list ; do
   found=$(grep -c ">$id" $file)
   if [ "$found" == "1" ] ; then
    if [ ! -s ${prefix_map_out}${file#${prefix_map_in}} ] ; then
-    newid=${file#${prefix_map_in}_}
-    newid=${newid%.${suffix_map}}
-    list_newid+="${newid} "
-    sed -e "s/MIDNUM/$newid/g" -e "s/seqid=.*/seqid=${id}/g" $script_map_refseq >${script_map_refseq/_MID/_$newid}
+    runid=${file#${prefix_map_in}_}
+    runid=${runid%.${suffix_map}}
+    list_runid+="${runid} "
+    sed -e "s/MIDNUM/$runid/g" -e "s/seqid=.*/seqid=${id}/g" $script_map_refseq >${script_map_refseq/_MID/_$runid}
    fi
    break
   fi
  done
  if [ "$found" == "0" ] ; then
   : $((++upper_num))
-  newid=${upper_num}
-  list_newid+="${newid} "
-  sed -e "s/MIDNUM/$newid/g" -e "s/seqid=.*/seqid=${id}/g" $script_map_refseq >${script_map_refseq/_MID/_$newid}
+  runid=${upper_num}
+  list_runid+="${runid} "
+  sed -e "s/MIDNUM/$runid/g" -e "s/seqid=.*/seqid=${id}/g" $script_map_refseq >${script_map_refseq/_MID/_$runid}
  fi
 done
 
@@ -116,14 +116,14 @@ fi
 
 # workflow of job submissions
 # maps to refseq
-for newid in $list_newid ; do
- jobid_map_refseq=$( sbatch --parsable                                   ${script_map_refseq/_MID/_$newid} | cut -d ";" -f 1 )
+for runid in $list_runid ; do
+ jobid_map_refseq=$( sbatch --parsable                                   ${script_map_refseq/_MID/_$runid} | cut -d ";" -f 1 )
  list_jobid+=:$jobid_map_refseq
- echo Submitted script ${script_map_refseq/_MID/_$newid} with job ID $jobid_map_refseq
+ echo Submitted script ${script_map_refseq/_MID/_$runid} with job ID $jobid_map_refseq
 done
 # multiple alignment (if applicable)
 if [ $con_num -gt 0 ] ; then
- if [ "$list_newid" != "" ] ; then
+ if [ "$list_runid" != "" ] ; then
   jobid_align=$(      sbatch --parsable --dependency=afterok"$list_jobid" ${script_align/_AID/_$alid}       | cut -d ";" -f 1 )
  else
   jobid_align=$(      sbatch --parsable                                   ${script_align/_AID/_$alid}       | cut -d ";" -f 1 )
