@@ -57,6 +57,7 @@ if [ ! -s refseq_${MID}.fasta ] ; then
 	-i -o refseq_${MID}_rc.fasta \
 	refseq_${MID}.fasta ${seqid%/rc}
   mv refseq_${MID}_rc.fasta refseq_${MID}.fasta
+  rm refseq_${MID}.fasta.fai
  fi
 else
  echo "Refseq file refseq_${MID}.fasta already exists"

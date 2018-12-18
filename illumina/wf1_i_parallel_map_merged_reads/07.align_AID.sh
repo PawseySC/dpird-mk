@@ -23,6 +23,7 @@ scratch="/scratch/director2091/mdelapierre/illumina/test1"
 # shifter definitions
 module load shifter
 srun_cmd="srun --export=all"
+samtools_cont="dpirdmk/samtools:1.9"
 mafft_cont="quay.io/biocontainers/mafft:7.407--0"
 
 
@@ -75,6 +76,7 @@ for id in $contig_list ; do
         -i -o consensus_contig_${contig_num}_rc.fasta \
         consensus_contig_${contig_num}.fasta $(grep "^>${id%/rc}_" consensus_contig_${contig_num}.fasta | tr -d '>')
    mv consensus_contig_${contig_num}_rc.fasta consensus_contig_${contig_num}.fasta
+   rm consensus_contig_${contig_num}.fasta.fai
   fi
  fi
 done
