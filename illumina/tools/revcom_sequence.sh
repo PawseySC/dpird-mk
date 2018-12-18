@@ -20,4 +20,5 @@ for f in "$@" ; do
  shifter run $samtools_cont samtools faidx \
 	-i -o $out  \
 	$f $(grep '^>' $f | tr -d '>')
+ rm ${f}.fai
 done
