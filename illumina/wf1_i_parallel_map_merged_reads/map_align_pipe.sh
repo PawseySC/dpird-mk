@@ -65,6 +65,7 @@ echo Scratch directory : $scratch
 
 # classify input arguments
 arg_list="$@"
+arg_list=${arg_list//_rc/\/rc}
 ref_list=$(echo $arg_list | xargs -n 1 | grep -v NODE | xargs)
 ref_num=$( echo $ref_list | wc -w)
 con_list=$(echo $arg_list | xargs -n 1 | grep NODE | xargs)
@@ -83,9 +84,18 @@ else
  upper_num=0
 fi
 for id in $ref_list ; do
+ if [ "${id: -3}" == "/rc" ] ; then
+  isrc="y"
+ else
+  isrc="n"
+ fi
  found=0
  for file in $refseq_files ; do
-  found=$(grep -c ">$id" $file)
+  if [ "$isrc" == "y" ] ; then
+   found=$(grep ">${id%/rc}" $file | grep -c "/rc")
+  else
+   found=$(grep ">${id%/rc}" $file | grep -cv "/rc")
+  fi
   if [ "$found" == "1" ] ; then
    if [ ! -s ${prefix_map_out}${file#${prefix_map_in}} ] ; then
     runid=${file#${prefix_map_in}_}
