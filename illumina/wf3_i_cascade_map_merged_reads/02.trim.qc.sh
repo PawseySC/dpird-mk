@@ -41,6 +41,7 @@ $srun_cmd shifter run $bbmap_cont bbduk.sh \
 	in=merged.fastq.gz \
 	out=trimmed-partial.fastq.gz \
 	ref=adapters ktrim=r k=27 hdist=2 edist=0 mink=4
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME trim1 end $(date)
 
 $srun_cmd shifter run $bbmap_cont bbduk.sh \
@@ -49,9 +50,11 @@ $srun_cmd shifter run $bbmap_cont bbduk.sh \
 	ref=adapters ktrim=l k=27 hdist=2 edist=0 mink=4 \
 	qtrim=rl trimq=13 \
 	minlength=30
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME trim2 end $(date)
 
 $srun_cmd shifter run $fastqc_cont fastqc clean.fastq.gz
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME qc end $(date)
 
 # copying output data back to group

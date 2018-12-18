@@ -44,23 +44,28 @@ $srun_cmd shifter run $bbmap_cont bbmap.sh \
 	out=mapped_contigs_sub_unsorted.sam \
 	k=13 maxindel=16000 ambig=random \
 	threads=$OMP_NUM_THREADS
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_contigs bbmap end $(date)
 
 $srun_cmd shifter run $samtools_cont samtools \
     view -b -o mapped_contigs_sub_unsorted.bam mapped_contigs_sub_unsorted.sam
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_contigs sam view end $(date)
 
 $srun_cmd shifter run $samtools_cont samtools \
     sort -o mapped_contigs_sub.bam mapped_contigs_sub_unsorted.bam
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_contigs sam sort end $(date)
 
 $srun_cmd shifter run $samtools_cont samtools \
     index mapped_contigs_sub.bam
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_contigs sam index end $(date)
 
 # depth data into text file
 $srun_cmd shifter run $samtools_cont samtools \
 	depth -aa mapped_contigs_sub.bam >depth_contigs_sub.dat
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_contigs sam depth end $(date)
 
 # creating consensus sequence
@@ -68,14 +73,17 @@ $srun_cmd shifter run $bcftools_cont bcftools \
 	mpileup -Ou -f contigs_sub.fasta mapped_contigs_sub.bam \
 	| shifter run $bcftools_cont bcftools \
 	call --ploidy 1 -mv -Oz -o calls_contigs_sub.vcf.gz
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_contigs bcf mpileup/call end $(date)
 
 $srun_cmd shifter run $bcftools_cont bcftools \
 	tabix calls_contigs_sub.vcf.gz
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_contigs bcf tabix end $(date)
 
 $srun_cmd shifter run $bcftools_cont bcftools \
 	consensus -f contigs_sub.fasta -o consensus_contigs_sub.fasta calls_contigs_sub.vcf.gz
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_contigs bcf consensus end $(date)
 
 # copying output data back to group

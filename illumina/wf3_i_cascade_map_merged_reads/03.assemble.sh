@@ -41,6 +41,7 @@ $srun_cmd shifter run $spades_cont spades.py \
 	--only-assembler \
 	-t $OMP_NUM_THREADS -m $((SLURM_MEM_PER_NODE/1024)) \
 	-o .
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME assemble end $(date)
 
 min_len_contig=1000

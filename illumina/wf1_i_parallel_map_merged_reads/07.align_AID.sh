@@ -75,6 +75,7 @@ for id in $contig_list ; do
    $srun_cmd shifter run $samtools_cont samtools faidx \
         -i -o consensus_contig_${contig_num}_rc.fasta \
         consensus_contig_${contig_num}.fasta $(grep "^>${id%/rc}_" consensus_contig_${contig_num}.fasta | tr -d '>')
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
    mv consensus_contig_${contig_num}_rc.fasta consensus_contig_${contig_num}.fasta
    rm consensus_contig_${contig_num}.fasta.fai
   fi
@@ -123,6 +124,7 @@ echo TIME align concat end $(date)
 $srun_cmd shifter run $mafft_cont mafft-linsi \
 	--thread $OMP_NUM_THREADS \
 	input_align_${AID}.fasta >aligned_${AID}.fasta
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME align mafft end $(date)
 
 # copying output data back to group

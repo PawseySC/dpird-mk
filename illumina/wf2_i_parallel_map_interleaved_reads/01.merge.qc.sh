@@ -38,9 +38,11 @@ echo TIME merge start $(date)
 $srun_cmd shifter run $bbmap_cont reformat.sh \
 	in1=R1.fastq.gz in2=R2.fastq.gz \
 	out=interleaved.fastq.gz
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME merge end $(date)
 
 $srun_cmd shifter run $fastqc_cont fastqc interleaved.fastq.gz
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME qc end $(date)
 
 # copying output data back to group

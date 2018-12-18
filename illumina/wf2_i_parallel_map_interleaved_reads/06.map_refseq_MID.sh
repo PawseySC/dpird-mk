@@ -52,10 +52,12 @@ if [ ! -s refseq_${MID}.fasta ] ; then
 	-db /group/data/blast/nt -entry ${seqid%/rc} \
 	-line_length 60 \
 	-out refseq_${MID}.fasta
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
  if [ "${seqid: -3}" == "/rc" ] ; then
   $srun_cmd shifter run $samtools_cont samtools faidx \
 	-i -o refseq_${MID}_rc.fasta \
 	refseq_${MID}.fasta ${seqid%/rc}
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
   mv refseq_${MID}_rc.fasta refseq_${MID}.fasta
   rm refseq_${MID}.fasta.fai
  fi
@@ -77,23 +79,28 @@ $srun_cmd shifter run $bbmap_cont bbmap.sh \
 	k=13 maxindel=16000 ambig=random \
 	path=ref_${MID} \
 	threads=$OMP_NUM_THREADS
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_refseq bbmap end $(date)
 
 $srun_cmd shifter run $samtools_cont samtools \
 	view -b -o mapped_refseq_${MID}_unsorted.bam mapped_refseq_${MID}_unsorted.sam
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_refseq sam view end $(date)
 
 $srun_cmd shifter run $samtools_cont samtools \
 	sort -o mapped_refseq_${MID}.bam mapped_refseq_${MID}_unsorted.bam
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_refseq sam sort end $(date)
 
 $srun_cmd shifter run $samtools_cont samtools \
 	index mapped_refseq_${MID}.bam
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_refseq sam index end $(date)
 
 # depth data into text file
 $srun_cmd shifter run $samtools_cont samtools \
     depth -aa mapped_refseq_${MID}.bam >depth_refseq_${MID}.dat
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_refseq sam depth end $(date)
 
 # creating consensus sequence
@@ -101,14 +108,17 @@ $srun_cmd shifter run $bcftools_cont bcftools \
     mpileup -Ou -f refseq_${MID}.fasta mapped_refseq_${MID}.bam \
     | shifter run $bcftools_cont bcftools \
     call --ploidy 1 -mv -Oz -o calls_refseq_${MID}.vcf.gz
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_refseq bcf mpileup/call end $(date)
 
 $srun_cmd shifter run $bcftools_cont bcftools \
     tabix calls_refseq_${MID}.vcf.gz
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_refseq bcf tabix end $(date)
 
 $srun_cmd shifter run $bcftools_cont bcftools \
     consensus -f refseq_${MID}.fasta -o consensus_refseq_${MID}.fasta calls_refseq_${MID}.vcf.gz
+if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME map_refseq bcf consensus end $(date)
 
 # copying output data back to group
