@@ -15,7 +15,7 @@ if [ "$rootdir" != "scratch" ] && [ "$rootdir" != "group" ] ; then
  exit
 fi
 
-if [ ! -s "$dirgr/upstream_pipe.sh" ] && [ ! -s "$dirgr/nanopore_pipe.sh" ] ; then
+if [ ! -s "$dirgr/upstream_pipe.sh" ] && [ ! -s $dirgr/map_align_pipe.sh ] && [ ! -s "$dirgr/nanopore_pipe.sh" ] ; then
  echo ""
  echo "Current location "$dirsc" seems not to be an illumina/nanopore workflow scratch directory. Exiting."
  echo "NOTE: no files have been deleted."
