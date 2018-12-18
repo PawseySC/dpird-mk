@@ -39,6 +39,7 @@ if [ $# -eq 0 ] ; then
  echo "   as argument, provide at least one refseq ID (from the BLAST output)."
  echo "2. Map reads to ref. sequences, then perform multiple alignment between those and a set of contig sequences; "
  echo "   as argument, provide at least one refseq ID (from the BLAST output) and one contig ID (from the assembled contigs file)."
+ echo "** Note you can ask for the reverse-complement of any reference/contig sequence, by appending \"_rc\" or \"/rc\" to their ID."
  echo "No arguments provided. Exiting."
  exit
 fi
