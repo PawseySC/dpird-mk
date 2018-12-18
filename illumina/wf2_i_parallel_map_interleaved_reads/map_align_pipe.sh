@@ -65,6 +65,7 @@ echo Scratch directory : $scratch
 
 # classify input arguments
 arg_list="$@"
+arg_list=${arg_list//_rc/\/rc}
 ref_list=$(echo $arg_list | xargs -n 1 | grep -v NODE | xargs)
 ref_num=$( echo $ref_list | wc -w)
 con_list=$(echo $arg_list | xargs -n 1 | grep NODE | xargs)
@@ -83,15 +84,24 @@ else
  upper_num=0
 fi
 for id in $ref_list ; do
+ if [ "${id: -3}" == "/rc" ] ; then
+  isrc="y"
+ else
+  isrc="n"
+ fi
  found=0
  for file in $refseq_files ; do
-  found=$(grep -c ">$id" $file)
+  if [ "$isrc" == "y" ] ; then
+   found=$(grep ">${id%/rc}" $file | grep -c "/rc")
+  else
+   found=$(grep ">${id%/rc}" $file | grep -cv "/rc")
+  fi
   if [ "$found" == "1" ] ; then
    if [ ! -s ${prefix_map_out}${file#${prefix_map_in}} ] ; then
     runid=${file#${prefix_map_in}_}
     runid=${runid%.${suffix_map}}
     list_runid+="${runid} "
-    sed -e "s/MIDNUM/$runid/g" -e "s/seqid=.*/seqid=${id}/g" $script_map_refseq >${script_map_refseq/_MID/_$runid}
+    sed -e "s/MIDNUM/$runid/g" -e "s;seqid=.*;seqid=${id};g" $script_map_refseq >${script_map_refseq/_MID/_$runid}
    fi
    break
   fi
@@ -100,7 +110,7 @@ for id in $ref_list ; do
   : $((++upper_num))
   runid=${upper_num}
   list_runid+="${runid} "
-  sed -e "s/MIDNUM/$runid/g" -e "s/seqid=.*/seqid=${id}/g" $script_map_refseq >${script_map_refseq/_MID/_$runid}
+  sed -e "s/MIDNUM/$runid/g" -e "s;seqid=.*;seqid=${id};g" $script_map_refseq >${script_map_refseq/_MID/_$runid}
  fi
 done
 
@@ -109,8 +119,8 @@ if [ $con_num -gt 0 ] ; then
  align_num=$(ls ${script_align/_AID/_[0-9]*} 2>/dev/null | wc -w)
  alid=$((++align_num))
  sed -e "s/AIDNUM/$alid/g" \
-  -e "s/refseq_list=.*/refseq_list=\"${ref_list}\"/g" \
-  -e "s/contig_list=.*/contig_list=\"${con_list}\"/g" \
+  -e "s;refseq_list=.*;refseq_list=\"${ref_list}\";g" \
+  -e "s;contig_list=.*;contig_list=\"${con_list}\";g" \
   $script_align >${script_align/_AID/_$alid}
 fi
 

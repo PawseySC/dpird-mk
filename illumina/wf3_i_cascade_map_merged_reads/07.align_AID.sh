@@ -23,6 +23,7 @@ scratch="/scratch/director2091/mdelapierre/illumina/test1"
 # shifter definitions
 module load shifter
 srun_cmd="srun --export=all"
+samtools_cont="dpirdmk/samtools:1.9"
 mafft_cont="quay.io/biocontainers/mafft:7.407--0"
 
 
@@ -47,9 +48,18 @@ echo TIME align contig start $(date)
 contig_files=$(ls consensus_contig_*.fasta 2>/dev/null)
 contig_num=$(echo $contig_files | wc -w)
 for id in $contig_list ; do
+ if [ "${id: -3}" == "/rc" ] ; then
+  isrc="y"
+ else
+  isrc="n"
+ fi
  found=0
  for file in $contig_files ; do
-  found=$(grep -c ">${id}_" $file)
+  if [ "$isrc" == "y" ] ; then
+   found=$(grep ">${id%/rc}_" $file | grep -c "/rc")
+  else
+   found=$(grep ">${id%/rc}_" $file | grep -cv "/rc")
+  fi
   if [ "$found" == "1" ] ; then
    consensus_contig_list+=" $file"
    break
@@ -58,7 +68,16 @@ for id in $contig_list ; do
  if [ "$found" == "0" ] ; then
   : $((++contig_num))
   consensus_contig_list+=" consensus_contig_${contig_num}.fasta"
-  awk -F _ -v id=${id#NODE_} '{ if(ok==1){if($1==">NODE"){exit}; print} ; if(ok!=1 && $1==">NODE" && $2==id){ok=1; print} }' consensus_contigs_sub.fasta >consensus_contig_${contig_num}.fasta
+  idawk=${id#NODE_}
+  idawk=${idawk%/rc}
+  awk -F _ -v id=$idawk '{ if(ok==1){if($1==">NODE"){exit}; print} ; if(ok!=1 && $1==">NODE" && $2==id){ok=1; print} }' consensus_contigs_sub.fasta >consensus_contig_${contig_num}.fasta
+  if [ "${id: -3}" == "/rc" ] ; then
+   $srun_cmd shifter run $samtools_cont samtools faidx \
+        -i -o consensus_contig_${contig_num}_rc.fasta \
+        consensus_contig_${contig_num}.fasta $(grep "^>${id%/rc}_" consensus_contig_${contig_num}.fasta | tr -d '>')
+   mv consensus_contig_${contig_num}_rc.fasta consensus_contig_${contig_num}.fasta
+   rm consensus_contig_${contig_num}.fasta.fai
+  fi
  fi
 done
 echo align list of contig IDs : ${contig_list}
@@ -68,9 +87,18 @@ echo TIME align contig end $(date)
 # building list of refseq(s)
 refseq_files=$(ls consensus_refseq_*.fasta 2>/dev/null)
 for id in $refseq_list ; do
+ if [ "${id: -3}" == "/rc" ] ; then
+  isrc="y"
+ else
+  isrc="n"
+ fi
  found=0
  for file in $refseq_files ; do
-  found=$(grep -c ">$id" $file)
+  if [ "$isrc" == "y" ] ; then
+   found=$(grep ">${id%/rc}" $file | grep -c "/rc")
+  else
+   found=$(grep ">${id%/rc}" $file | grep -cv "/rc")
+  fi
   if [ "$found" == "1" ] ; then
    consensus_refseq_list+=" $file"
    break

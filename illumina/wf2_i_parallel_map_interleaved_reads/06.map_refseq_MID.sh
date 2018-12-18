@@ -49,9 +49,16 @@ echo map_refseq refseq ID : ${seqid}
 echo TIME map_refseq blastdb start $(date)
 if [ ! -s refseq_${MID}.fasta ] ; then
  $srun_cmd shifter run $blast_cont  blastdbcmd \
-	-db /group/data/blast/nt -entry $seqid \
+	-db /group/data/blast/nt -entry ${seqid%/rc} \
 	-line_length 60 \
 	-out refseq_${MID}.fasta
+ if [ "${seqid: -3}" == "/rc" ] ; then
+  $srun_cmd shifter run $samtools_cont samtools faidx \
+	-i -o refseq_${MID}_rc.fasta \
+	refseq_${MID}.fasta ${seqid%/rc}
+  mv refseq_${MID}_rc.fasta refseq_${MID}.fasta
+  rm refseq_${MID}.fasta.fai
+ fi
 else
  echo "Refseq file refseq_${MID}.fasta already exists"
 fi
