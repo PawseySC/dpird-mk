@@ -127,13 +127,17 @@ fi
 
 # workflow of job submissions
 # maps to refseq
-runid=$(echo $list_runid |cut -d " " -f 1)
-jobid_map_refseq=$(  sbatch --parsable                                        ${script_map_refseq/_MID/_$runid} | cut -d ";" -f 1 )
-echo Submitted script ${script_map_refseq/_MID/_$runid} with job ID $jobid_map_refseq
-for runid in $(echo $list_runid |cut -d " " -f 1 --complement) ; do
- jobid_map_refseq=$( sbatch --parsable --dependency=afterok:$jobid_map_refseq ${script_map_refseq/_MID/_$runid} | cut -d ";" -f 1 )
+if [ "$list_runid" != "" ] ; then
+ runid=$(echo $list_runid |cut -d " " -f 1)
+ jobid_map_refseq=$(  sbatch --parsable                                        ${script_map_refseq/_MID/_$runid} | cut -d ";" -f 1 )
  echo Submitted script ${script_map_refseq/_MID/_$runid} with job ID $jobid_map_refseq
-done
+ if [ $(echo $list_runid |wc -w) -ge 2 ] ; then
+  for runid in $(echo $list_runid |cut -d " " -f 2-) ; do
+   jobid_map_refseq=$( sbatch --parsable --dependency=afterok:$jobid_map_refseq ${script_map_refseq/_MID/_$runid} | cut -d ";" -f 1 )
+   echo Submitted script ${script_map_refseq/_MID/_$runid} with job ID $jobid_map_refseq
+  done
+ fi
+fi
 # multiple alignment (if applicable)
 if [ $con_num -gt 0 ] ; then
  if [ "$list_runid" != "" ] ; then
