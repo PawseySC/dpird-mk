@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=basecall.np
 #SBATCH --output=%x.out
-#SBATCH --account=director2091
+#SBATCH --account=pawsey0281
 #SBATCH --clusters=zeus
 #SBATCH --partition=longq
 #SBATCH --ntasks=1

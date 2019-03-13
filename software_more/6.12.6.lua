@@ -7,5 +7,5 @@ All the interactive tools you need in one application.
 For further information see http://ab.inf.uni-tuebingen.de/software/megan6]] )
 load("java")
 if (mode() ~= "whatis") then
-prepend_path("PATH","/group/director2091/software/sles12sp3/apps/binary/megan/6.12.6")
+prepend_path("PATH","/group/pawsey0281/software/sles12sp3/apps/binary/megan/6.12.6")
 end

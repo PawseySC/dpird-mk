@@ -16,7 +16,7 @@ cat << 'EOF' >sbatch_align_samples_${list_prefix_out}.sh
 
 #SBATCH --job-name=sbatch_align_samples_FILELIST
 #SBATCH --output=%x.out
-#SBATCH --account=director2091
+#SBATCH --account=pawsey0281
 #SBATCH --clusters=zeus
 #SBATCH --partition=workq
 #SBATCH --ntasks=1

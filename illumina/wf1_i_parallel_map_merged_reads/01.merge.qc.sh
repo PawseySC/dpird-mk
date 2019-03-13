@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=merge.qc
 #SBATCH --output=%x.out
-#SBATCH --account=director2091
+#SBATCH --account=pawsey0281
 #SBATCH --clusters=zeus
 #SBATCH --partition=workq
 #SBATCH --ntasks=1

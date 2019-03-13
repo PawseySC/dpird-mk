@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=align_AIDNUM
 #SBATCH --output=%x.out
-#SBATCH --account=director2091
+#SBATCH --account=pawsey0281
 #SBATCH --clusters=zeus
 #SBATCH --partition=workq
 #SBATCH --ntasks=1
@@ -16,9 +16,9 @@ export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 AID="AIDNUM"
 
 # sample id and working directories
-sample="test1"
-group="/group/director2091/mdelapierre/illumina/test1"
-scratch="/scratch/director2091/mdelapierre/illumina/test1"
+sample=
+group=
+scratch=
 
 # shifter definitions
 module load shifter

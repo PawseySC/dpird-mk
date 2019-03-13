@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # project id
-account=director2091
+account=pawsey0281
 
 # directory names
 # some assumptions are in place:
