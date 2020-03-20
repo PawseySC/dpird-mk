@@ -10,7 +10,7 @@ Computing: containerisation, workflow automation (bash), porting of input parame
 
 Contents: 
 * [illumina](illumina/): scripts for Illumina NGS pipeline
-* [nanopore](nanopore/): scripts for Nanopore pipeline
+* [nanopore](nanopore/): scripts for Nanopore pipeline -- unsupported, see https://github.com/marcodelapierre/nanopore-nf.git
 * [dockerfiles](dockerfiles/): for samtools, bcftools, pomoxis
 * [cygnet](cygnet/): [maali](https://github.com/PawseySC/maali) recipes for IGV vis tool
 * [software_more](software_more/): install instructions for Megan vis tool
