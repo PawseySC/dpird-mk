@@ -2,6 +2,7 @@
 # this script is to be run once only on a computer with Singularity, to install the containers relevant to the workflow
 
 cont_bin="singularity"
+module load singularity
 
 packages="
 quay.io/biocontainers/fastqc:0.11.7--4
