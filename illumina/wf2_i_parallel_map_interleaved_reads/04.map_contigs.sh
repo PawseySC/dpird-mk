@@ -19,7 +19,7 @@ group=
 scratch=
 
 # shifter definitions
-module load shifter
+module load singularity
 srun_cmd="srun --export=all"
 bbmap_cont="quay.io/biocontainers/bbmap:38.20--h470a237_0"
 samtools_cont="dpirdmk/samtools:1.9"

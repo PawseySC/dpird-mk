@@ -21,7 +21,7 @@ group=
 scratch=
 
 # shifter definitions
-module load shifter
+module load singularity
 srun_cmd="srun --export=all"
 samtools_cont="dpirdmk/samtools:1.9"
 mafft_cont="quay.io/biocontainers/mafft:7.407--0"

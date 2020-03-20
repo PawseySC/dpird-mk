@@ -19,7 +19,7 @@ group=
 scratch=
 
 # shifter definitions
-module load shifter
+module load singularity
 srun_cmd="srun --export=all"
 spades_cont="quay.io/biocontainers/spades:3.12.0--1"
 
