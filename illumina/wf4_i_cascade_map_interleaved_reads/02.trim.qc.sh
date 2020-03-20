@@ -37,7 +37,7 @@ echo Scratch directory : $scratch
 echo SLURM job id : $SLURM_JOB_ID
 
 echo TIME trim1 start $(date)
-$srun_cmd shifter run $bbmap_cont bbduk.sh \
+$srun_cmd singularity exec docker://$bbmap_cont bbduk.sh \
 	in=interleaved.fastq.gz \
 	out=trimmed-partial.fastq.gz \
 	interleaved=t \
@@ -45,7 +45,7 @@ $srun_cmd shifter run $bbmap_cont bbduk.sh \
 if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME trim1 end $(date)
 
-$srun_cmd shifter run $bbmap_cont bbduk.sh \
+$srun_cmd singularity exec docker://$bbmap_cont bbduk.sh \
 	in=trimmed-partial.fastq.gz \
 	out=clean.fastq.gz \
 	interleaved=t \
@@ -55,7 +55,7 @@ $srun_cmd shifter run $bbmap_cont bbduk.sh \
 if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME trim2 end $(date)
 
-$srun_cmd shifter run $fastqc_cont fastqc clean.fastq.gz
+$srun_cmd singularity exec docker://$fastqc_cont fastqc clean.fastq.gz
 if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME qc end $(date)
 

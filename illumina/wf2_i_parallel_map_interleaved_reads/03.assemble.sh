@@ -36,7 +36,7 @@ echo Scratch directory : $scratch
 echo SLURM job id : $SLURM_JOB_ID
 
 echo TIME assemble start $(date)
-$srun_cmd shifter run $spades_cont spades.py \
+$srun_cmd singularity exec docker://$spades_cont spades.py \
 	--12 clean.fastq.gz \
 	--only-assembler \
 	-t $OMP_NUM_THREADS -m $((SLURM_MEM_PER_NODE/1024)) \

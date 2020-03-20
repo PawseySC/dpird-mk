@@ -72,7 +72,7 @@ for id in $contig_list ; do
   idawk=${idawk%/rc}
   awk -F _ -v id=$idawk '{ if(ok==1){if($1==">NODE"){exit}; print} ; if(ok!=1 && $1==">NODE" && $2==id){ok=1; print} }' consensus_contigs_sub.fasta >consensus_contig_${contig_num}.fasta
   if [ "${id: -3}" == "/rc" ] ; then
-   $srun_cmd shifter run $samtools_cont samtools faidx \
+   $srun_cmd singularity exec docker://$samtools_cont samtools faidx \
         -i -o consensus_contig_${contig_num}_rc.fasta \
         consensus_contig_${contig_num}.fasta $(grep "^>${id%/rc}_" consensus_contig_${contig_num}.fasta | tr -d '>')
 if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
@@ -121,7 +121,7 @@ cat $consensus_refseq_list $consensus_contig_list >input_align_${AID}.fasta
 echo TIME align concat end $(date)
 
 # multiple alignment of selected consensus sequences
-$srun_cmd shifter run $mafft_cont mafft-linsi \
+$srun_cmd singularity exec docker://$mafft_cont mafft-linsi \
 	--thread $OMP_NUM_THREADS \
 	input_align_${AID}.fasta >aligned_${AID}.fasta
 if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi

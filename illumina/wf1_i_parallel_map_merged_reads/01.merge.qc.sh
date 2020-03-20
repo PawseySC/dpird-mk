@@ -35,13 +35,13 @@ echo Scratch directory : $scratch
 echo SLURM job id : $SLURM_JOB_ID
 
 echo TIME merge start $(date)
-$srun_cmd shifter run $bbmap_cont bbmerge.sh \
+$srun_cmd singularity exec docker://$bbmap_cont bbmerge.sh \
 	in1=R1.fastq.gz in2=R2.fastq.gz \
 	out=merged.fastq.gz
 if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME merge end $(date)
 
-$srun_cmd shifter run $fastqc_cont fastqc merged.fastq.gz
+$srun_cmd singularity exec docker://$fastqc_cont fastqc merged.fastq.gz
 if [ "$?" != "0" ] ; then echo "ERROR in workflow: last srun command failed. Exiting." ; exit 1 ; fi
 echo TIME qc end $(date)
 
