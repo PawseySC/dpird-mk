@@ -10,6 +10,7 @@ quay.io/biocontainers/spades:3.12.0--1
 dpirdmk/samtools:1.9
 dpirdmk/bcftools:1.8
 quay.io/biocontainers/blast:2.7.1--h96bfa4b_5
+quay.io/biocontainers/mafft:7.407--0
 "
 
 for p in $packages ; do
