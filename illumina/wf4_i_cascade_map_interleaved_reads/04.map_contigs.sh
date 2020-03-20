@@ -18,7 +18,7 @@ sample=
 group=
 scratch=
 
-# shifter definitions
+# container definitions
 module load singularity
 srun_cmd="srun --export=all"
 bbmap_cont="quay.io/biocontainers/bbmap:38.20--h470a237_0"

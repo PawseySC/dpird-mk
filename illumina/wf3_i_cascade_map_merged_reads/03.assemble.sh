@@ -18,7 +18,7 @@ sample=
 group=
 scratch=
 
-# shifter definitions
+# container definitions
 module load singularity
 srun_cmd="srun --export=all"
 spades_cont="quay.io/biocontainers/spades:3.12.0--1"

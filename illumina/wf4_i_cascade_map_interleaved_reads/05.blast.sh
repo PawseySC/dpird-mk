@@ -18,7 +18,7 @@ sample=
 group=
 scratch=
 
-# shifter definitions
+# container definitions
 module load singularity
 srun_cmd="srun --export=all"
 samtools_cont="dpirdmk/samtools:1.9"

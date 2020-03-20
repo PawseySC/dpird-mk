@@ -20,7 +20,7 @@ sample=
 group=
 scratch=
 
-# shifter definitions
+# container definitions
 module load singularity
 srun_cmd="srun --export=all"
 blast_cont="quay.io/biocontainers/blast:2.7.1--h96bfa4b_5"
