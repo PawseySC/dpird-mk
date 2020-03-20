@@ -27,8 +27,8 @@ cat << 'EOF' >sbatch_align_samples_${list_prefix_out}.sh
 #SBATCH --export=NONE 
 export OMP_NUM_THREADS=$SLURM_CPUS_PER_TASK
 
-# shifter definitions
-module load shifter
+# container definitions
+module load singularity
 srun_cmd="srun --export=all"
 mafft_cont="quay.io/biocontainers/mafft:7.407--0"
 
@@ -42,7 +42,7 @@ echo SLURM job id : $SLURM_JOB_ID
 cat $(cat ${list_prefix_in} |xargs) >input_align_samples_${list_prefix_in}.fasta
 
 # multiple alignment of selected consensus sequences
-$srun_cmd shifter run $mafft_cont mafft-linsi \
+$srun_cmd singularity exec docker://$mafft_cont mafft-linsi \
 	--thread $OMP_NUM_THREADS \
 	input_align_samples_${list_prefix_in}.fasta >output_align_samples_${list_prefix_in}.fasta
 EOF

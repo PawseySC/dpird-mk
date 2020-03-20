@@ -1,5 +1,5 @@
 #!/bin/bash
-module load shifter
+module load singularity
 samtools_cont="dpirdmk/samtools:1.9"
 
 if [ "$#" -lt 1 ] ; then
@@ -17,7 +17,7 @@ for f in "$@" ; do
  else
   out=${pre}_999${runid}.$suf
  fi
- shifter run $samtools_cont samtools faidx \
+ singularity exec docker://$samtools_cont samtools faidx \
 	-i -o $out  \
 	$f $(grep '^>' $f | tr -d '>')
  rm ${f}.fai
